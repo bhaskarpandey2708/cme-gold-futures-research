@@ -852,28 +852,41 @@ class QuantAPIServer:
             cur = conn.cursor()
 
             # 1. Recent Logins from email_otp_log
-            cur.execute("""
-                SELECT id, created_at, email, name, organization, role, phone, verified, ip_address, status
-                FROM email_otp_log
-                ORDER BY id DESC LIMIT 50
-            """)
-            logins = [dict(r) for r in cur.fetchall()]
+            logins = []
+            try:
+                cur.execute("""
+                    SELECT id, created_at, email, name, organization, role, phone, verified, ip_address, status
+                    FROM email_otp_log
+                    ORDER BY id DESC LIMIT 50
+                """)
+                logins = [dict(r) for r in cur.fetchall()]
+            except Exception as e:
+                logger.warning(f"Failed to fetch logins: {e}")
 
             # 2. Allocator Leads from leads_and_signups
-            cur.execute("""
-                SELECT id, created_at, name, email, organization, role, interest_type, capital_capacity, notes, source
-                FROM leads_and_signups
-                ORDER BY id DESC LIMIT 50
-            """)
-            leads = [dict(r) for r in cur.fetchall()]
+            leads = []
+            try:
+                cur.execute("""
+                    SELECT id, created_at, name, email, organization, role, interest_type, capital_capacity, notes, source
+                    FROM leads_and_signups
+                    ORDER BY id DESC LIMIT 50
+                """)
+                leads = [dict(r) for r in cur.fetchall()]
+            except Exception as e:
+                logger.warning(f"Failed to fetch leads: {e}")
 
             # 3. Feedback submissions
-            cur.execute("""
-                SELECT id, created_at, name, email, role, feedback_type, message
-                FROM user_feedback
-                ORDER BY id DESC LIMIT 30
-            """)
-            feedback = [dict(r) for r in cur.fetchall()]
+            feedback = []
+            try:
+                cur.execute("""
+                    SELECT id, created_at, name, email, feedback_type, rating, message, source
+                    FROM user_feedback
+                    ORDER BY id DESC LIMIT 30
+                """)
+                feedback = [dict(r) for r in cur.fetchall()]
+            except Exception as e:
+                logger.warning(f"Failed to fetch feedback: {e}")
+
             conn.close()
 
             verified_count = sum(1 for l in logins if l.get("verified") == 1)
