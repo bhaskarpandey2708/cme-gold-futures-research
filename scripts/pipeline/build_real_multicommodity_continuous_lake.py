@@ -34,8 +34,8 @@ import pyarrow.parquet as pq
 print = functools.partial(print, flush=True)
 
 # Directory configurations
-LOCAL_DIR = Path(__file__).resolve().parents[1]
-GDRIVE_DIR = Path(__file__).resolve().parents[1]
+LOCAL_DIR = Path(__file__).resolve().parents[2]
+GDRIVE_DIR = Path(__file__).resolve().parents[2]
 BASE_DIR = GDRIVE_DIR if GDRIVE_DIR.exists() else LOCAL_DIR
 
 DATA_DIR = BASE_DIR / "data"

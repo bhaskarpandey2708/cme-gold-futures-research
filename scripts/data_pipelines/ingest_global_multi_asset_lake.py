@@ -25,7 +25,7 @@ import pandas as pd
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 CONFIG_PATH = BASE_DIR / "config" / "assets" / "global_universe.json"
 DATA_DIR = BASE_DIR / "data"
 RAW_DIR = DATA_DIR / "raw"

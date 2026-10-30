@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from scipy import stats
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 CATALOG_PATH = DATA_DIR / "lakes" / "global_cross_asset_catalog.json"
 AUDIT_DIR = DATA_DIR / "quality_audit"
