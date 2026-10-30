@@ -760,7 +760,7 @@ class QuantAPIServer:
                 <h2 style="color:#ffffff; font-size:19px; margin:0 0 10px 0;">Your Verification Access Code</h2>
                 <p style="color:#94a3b8; font-size:13.5px; line-height:1.5; margin:0 0 20px 0;">
                     Hello {name or 'Trader'},<br>
-                    Use the 6-digit one-time password below to authenticate and unlock the live <strong>Apex Databento CME Multi-Commodity Cockpit</strong>:
+                    Use the 6-digit one-time password below to authenticate and unlock the live <strong>Apex CME Multi-Commodity Quantitative Terminal</strong>:
                 </p>
                 <div style="background:#0d121c; border:1px solid #06b6d4; border-radius:8px; padding:16px 20px; text-align:center; margin-bottom:20px;">
                     <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:8px; color:#10b981;">{otp_code}</span>
