@@ -94,8 +94,8 @@ def run_optimize():
 
 
 def run_memo():
-    cmd = [str(PYTHON), str(BASE_DIR / "scripts" / "generate_daily_market_memo.py")]
-    subprocess.run(cmd)
+    subprocess.run([str(PYTHON), str(BASE_DIR / "scripts" / "generate_daily_market_memo.py")])
+    subprocess.run([str(PYTHON), str(BASE_DIR / "scripts" / "generate_multi_commodity_daily_memo.py")])
 
 
 def run_dispatch():
