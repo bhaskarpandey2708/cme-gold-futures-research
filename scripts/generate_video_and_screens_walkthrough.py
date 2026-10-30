@@ -39,17 +39,17 @@ def run_walkthrough():
         )
         page = context.new_page()
 
-        # Step 0: Handle Free Email Login OTP Gate
-        print("▶ Step 0: Checking Free Email Login OTP Gate...")
+        # Step 0: Handle Institutional Login OTP Gate
+        print("▶ Step 0: Checking Institutional Login OTP Gate...")
         page.goto(LIVE_URL, wait_until="domcontentloaded", timeout=45000)
         page.wait_for_timeout(2000)
         if page.is_visible("#authGateBackdrop"):
-            print("   🔒 Auth Gate active — capturing login intake...")
+            print("   🔒 Auth Gate active — capturing institutional login intake...")
             page.screenshot(path=str(SCREENS_DIR / "auth_gate_login_modal_view.png"), full_page=False)
             page.fill("#auth-name", "Alexander Vance")
             page.fill("#auth-email", "alexander@meridiancap.com")
             page.fill("#auth-phone", "+91 9470778244")
-            page.click("button:has-text('Send Free Login OTP')")
+            page.click("#btn-request-otp")
             page.wait_for_timeout(1500)
             if page.is_visible("#auth-demo-banner"):
                 page.click("#auth-demo-banner")
@@ -57,9 +57,9 @@ def run_walkthrough():
                 page.fill("#auth-otp", "999999")
             page.wait_for_timeout(800)
             page.screenshot(path=str(SCREENS_DIR / "auth_gate_otp_step2_view.png"), full_page=False)
-            page.click("button:has-text('Verify & Unlock Live Dashboard')")
+            page.click("#btn-verify-otp")
             page.wait_for_timeout(2000)
-            print("   🔓 Auth Gate verified — dashboard unlocked!")
+            print("   🔓 Auth Gate verified — terminal unlocked!")
 
         # Step 1: Master Cockpit Load (Apex Canvas Chart + MBP-10 DOM)
         print("▶ Step 1: Loading Master Apex Multi-Commodity Cockpit...")
@@ -152,7 +152,7 @@ def run_walkthrough():
 
         # Step 8: Switch to Tab 5: Apex Developer SDK & Multi-Language Gateways
         print("▶ Step 8: Viewing Apex Developer SDK & Programmatic Gateways...")
-        page.click("button.nav-tab-btn:has-text('Python / C++ SDK')")
+        page.click("button.nav-tab-btn:has-text('Apex Client SDK')")
         page.wait_for_timeout(1500)
         page.screenshot(path=str(SCREENS_DIR / "developer_sdk_integration_view.png"), full_page=False)
         page.screenshot(path=str(SCREENS_DIR / "developer_sdk_python_view.png"), full_page=False)
@@ -180,7 +180,7 @@ def run_walkthrough():
         print("▶ Step 9: Opening Institutional Allocator Pilot Modal...")
         page.click("button.nav-tab-btn:has-text('Live Trading')")
         page.wait_for_timeout(800)
-        page.click("button:has-text('⚡ Request Allocator Pilot')")
+        page.click("button:has-text('Request Allocator Pilot')")
         page.wait_for_timeout(1200)
         page.fill("#lead-name", "James Sterling")
         page.fill("#lead-email", "j.sterling@meridian-funds.com")
@@ -194,7 +194,7 @@ def run_walkthrough():
 
         # Step 10: Provision Pilot Credentials & API Key
         print("▶ Step 10: Provisioning Pilot Credentials & Tearsheet Access...")
-        page.click("button:has-text('Submit Request & Provision Pilot Credentials')")
+        page.click("button:has-text('Provision Pilot Credentials')")
         page.wait_for_timeout(2500)
         page.screenshot(path=str(SCREENS_DIR / "07_lead_provisioned_success_view.png"), full_page=False)
         print("   ✅ Captured: 07_lead_provisioned_success_view.png")
@@ -203,7 +203,7 @@ def run_walkthrough():
 
         # Step 11: Open Pre-Market Intelligence Memo Modal
         print("▶ Step 11: Opening Pre-Market Daily Intelligence Memo...")
-        page.click("button:has-text('📄 Pre-Market Memo')")
+        page.click("button:has-text('Pre-Market Memo')")
         page.wait_for_timeout(2500)
         page.screenshot(path=str(SCREENS_DIR / "08_premarket_memo_modal_view.png"), full_page=False)
         print("   ✅ Captured: 08_premarket_memo_modal_view.png")
