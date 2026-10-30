@@ -61,10 +61,45 @@ def run_walkthrough():
             page.wait_for_timeout(2000)
             print("   🔓 Auth Gate verified — dashboard unlocked!")
 
-        # Step 1: Master Cockpit Load (TradingView Chart + MBP-10 DOM)
-        print("▶ Step 1: Loading Master Multi-Commodity Cockpit...")
+        # Step 1: Master Cockpit Load (Apex Canvas Chart + MBP-10 DOM)
+        print("▶ Step 1: Loading Master Apex Multi-Commodity Cockpit...")
         page.screenshot(path=str(SCREENS_DIR / "01_master_cockpit_gold_view.png"), full_page=False)
         print("   ✅ Captured: 01_master_cockpit_gold_view.png")
+
+        # Step 1B: Interactive Guided Walkthrough Tour
+        print("▶ Step 1B: Launching Interactive Guided Walkthrough Tour...")
+        page.click("button:has-text('💡 Platform Tour')")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step1_ribbon_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step1_ribbon_view.png")
+
+        page.click("#tourBtnNext")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step2_chart_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step2_chart_view.png")
+
+        page.click("#tourBtnNext")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step3_dom_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step3_dom_view.png")
+
+        page.click("#tourBtnNext")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step4_risk_firewall_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step4_risk_firewall_view.png")
+
+        page.click("#tourBtnNext")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step5_architecture_tabs_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step5_architecture_tabs_view.png")
+
+        page.click("#tourBtnNext")
+        page.wait_for_timeout(1000)
+        page.screenshot(path=str(SCREENS_DIR / "tour_step6_whatsapp_desk_view.png"), full_page=False)
+        print("   ✅ Captured: tour_step6_whatsapp_desk_view.png")
+
+        page.click("#tourBtnNext")  # Finish Tour
+        page.wait_for_timeout(1200)
 
         # Step 2: Switch to Silver (SI.FUT)
         print("▶ Step 2: Switching to Silver (SI.FUT)...")
@@ -93,12 +128,13 @@ def run_walkthrough():
         print("   ✅ Captured: 05_canary_order_router_view.png")
 
         # Step 5: Switch to Tab 2: Schema Explorer & Lake
-        print("▶ Step 5: Viewing Databento Schema Explorer & Lakehouse Store...")
+        print("▶ Step 5: Viewing Apex CME Schema Explorer & Lakehouse Store...")
         page.click("button.nav-tab-btn:has-text('Schema Explorer')")
         page.wait_for_timeout(2000)
         page.screenshot(path=str(SCREENS_DIR / "04_natural_gas_view.png"), full_page=False)
+        page.screenshot(path=str(SCREENS_DIR / "apex_schemas_lakehouse_view.png"), full_page=False)
         page.screenshot(path=str(SCREENS_DIR / "databento_schemas_lakehouse_view.png"), full_page=False)
-        print("   ✅ Captured: databento_schemas_lakehouse_view.png")
+        print("   ✅ Captured: apex_schemas_lakehouse_view.png")
 
         # Step 6: Switch to Tab 3: Sparse MoE Engine
         print("▶ Step 6: Inspecting Sparse MoE Neural Engine & Microstructure Gauges...")
@@ -114,12 +150,31 @@ def run_walkthrough():
         page.screenshot(path=str(SCREENS_DIR / "institutional_blotter_tearsheet_view.png"), full_page=False)
         print("   ✅ Captured: institutional_blotter_tearsheet_view.png")
 
-        # Step 8: Switch to Tab 5: Developer SDK
-        print("▶ Step 8: Viewing Databento Developer SDK & API Gateway...")
+        # Step 8: Switch to Tab 5: Apex Developer SDK & Multi-Language Gateways
+        print("▶ Step 8: Viewing Apex Developer SDK & Programmatic Gateways...")
         page.click("button.nav-tab-btn:has-text('Python / C++ SDK')")
-        page.wait_for_timeout(1800)
+        page.wait_for_timeout(1500)
         page.screenshot(path=str(SCREENS_DIR / "developer_sdk_integration_view.png"), full_page=False)
-        print("   ✅ Captured: developer_sdk_integration_view.png")
+        page.screenshot(path=str(SCREENS_DIR / "developer_sdk_python_view.png"), full_page=False)
+        print("   ✅ Captured: developer_sdk_python_view.png")
+
+        page.click("#btn-sdk-cpp")
+        page.wait_for_timeout(800)
+        page.screenshot(path=str(SCREENS_DIR / "developer_sdk_cpp_view.png"), full_page=False)
+        print("   ✅ Captured: developer_sdk_cpp_view.png")
+
+        page.click("#btn-sdk-rust")
+        page.wait_for_timeout(800)
+        page.screenshot(path=str(SCREENS_DIR / "developer_sdk_rust_view.png"), full_page=False)
+        print("   ✅ Captured: developer_sdk_rust_view.png")
+
+        page.click("#btn-sdk-curl")
+        page.wait_for_timeout(800)
+        page.screenshot(path=str(SCREENS_DIR / "developer_sdk_curl_view.png"), full_page=False)
+        print("   ✅ Captured: developer_sdk_curl_view.png")
+
+        page.click("#btn-sdk-py")
+        page.wait_for_timeout(600)
 
         # Step 9: Return to Tab 1 and Open Allocator Lead Modal
         print("▶ Step 9: Opening Institutional Allocator Pilot Modal...")
@@ -162,7 +217,7 @@ def run_walkthrough():
         page.fill("#fb-name", "Dr. Aris Thorne")
         page.fill("#fb-email", "thorne@oxford-quant.ac.uk")
         page.select_option("#fb-type", "Feature Request")
-        page.fill("#fb-msg", "Superb Databento MBP-10 execution latency (0.19ms) and L10 orderbook queue dynamics. Would love to see cross-asset volatility surface integration.")
+        page.fill("#fb-msg", "Superb Apex MBP-10 execution latency (0.19ms) and L10 orderbook queue dynamics. Would love to see cross-asset volatility surface integration.")
         page.wait_for_timeout(1000)
         page.screenshot(path=str(SCREENS_DIR / "09_feedback_modal_view.png"), full_page=False)
         print("   ✅ Captured: 09_feedback_modal_view.png")
