@@ -31,9 +31,14 @@ import json
 import sqlite3
 import asyncio
 import argparse
+import uuid
+import random
+import smtplib
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dataclasses import asdict
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import aiohttp
 from aiohttp import web
 
@@ -57,6 +62,7 @@ class QuantAPIServer:
         self.rag = QuantRAGEngine()
         self.gis_engine = CMEGlobalIntelligenceEngine()
         self.multiscale_engine = MultiScaleDataEngine()
+        self._init_crm_tables()
         self.app = web.Application()
         self.active_websockets = set()
         self._setup_routes()
@@ -92,6 +98,10 @@ class QuantAPIServer:
         self.app.router.add_post("/api/v1/ask", self.handle_ask)
         self.app.router.add_post("/api/v1/query", self.handle_query)
         self.app.router.add_post("/api/v1/cockpit/order", self.handle_cockpit_order)
+        self.app.router.add_post("/api/v1/auth/request-otp", self.handle_request_otp)
+        self.app.router.add_post("/api/v1/auth/verify-otp", self.handle_verify_otp)
+        self.app.router.add_get("/api/v1/auth/session", self.handle_auth_session)
+        self.app.router.add_get("/api/v1/leads", self.handle_get_leads)
 
     async def start_background_tasks(self, app):
         app["broadcaster"] = asyncio.create_task(self._broadcaster_loop())
@@ -671,6 +681,307 @@ class QuantAPIServer:
             rows = [dict(r) for r in cur.fetchall()]
             conn.close()
             return web.json_response({"count": len(rows), "feedback": rows})
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    def _init_crm_tables(self):
+        try:
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            crm_db = DATA_DIR / "crm_leads.db"
+            conn = sqlite3.connect(crm_db)
+            cur = conn.cursor()
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS email_otp_log (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_at TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    name TEXT,
+                    organization TEXT,
+                    role TEXT,
+                    phone TEXT,
+                    otp_code TEXT NOT NULL,
+                    expires_at TEXT NOT NULL,
+                    verified INTEGER DEFAULT 0,
+                    session_token TEXT,
+                    ip_address TEXT
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS leads_and_signups (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_at TEXT NOT NULL,
+                    name TEXT,
+                    email TEXT NOT NULL,
+                    organization TEXT,
+                    role TEXT,
+                    interest_type TEXT,
+                    capital_capacity TEXT,
+                    notes TEXT,
+                    source TEXT
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS user_feedback (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_at TEXT NOT NULL,
+                    name TEXT,
+                    email TEXT,
+                    feedback_type TEXT,
+                    rating INTEGER,
+                    message TEXT,
+                    source TEXT
+                )
+            """)
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"[WARN] Error initializing CRM tables: {e}")
+
+    def _send_email_otp(self, to_email: str, name: str, otp_code: str) -> tuple[bool, str]:
+        smtp_user = os.getenv("SMTP_USER", "").strip()
+        smtp_pass = os.getenv("SMTP_PASS", "").strip()
+        smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
+        smtp_port = int(os.getenv("SMTP_PORT", "587"))
+
+        if not smtp_user or not smtp_pass:
+            return False, "NO_SMTP_CREDENTIALS"
+
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"🔐 Your Apex CME Platform Login Code: {otp_code}"
+            msg["From"] = f"Apex CME Institutional Desk <{smtp_user}>"
+            msg["To"] = to_email
+
+            html = f"""
+            <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#07090e; color:#f8fafc; padding:28px; border-radius:10px; max-width:520px; margin:auto; border:1px solid #1a2335;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+                    <span style="font-size:22px; color:#06b6d4; font-weight:800;">Δ APEX QUANTITATIVE</span>
+                </div>
+                <h2 style="color:#ffffff; font-size:19px; margin:0 0 10px 0;">Your Verification Access Code</h2>
+                <p style="color:#94a3b8; font-size:13.5px; line-height:1.5; margin:0 0 20px 0;">
+                    Hello {name or 'Trader'},<br>
+                    Use the 6-digit one-time password below to authenticate and unlock the live <strong>Apex Databento CME Multi-Commodity Cockpit</strong>:
+                </p>
+                <div style="background:#0d121c; border:1px solid #06b6d4; border-radius:8px; padding:16px 20px; text-align:center; margin-bottom:20px;">
+                    <span style="font-family:'Courier New',monospace; font-size:32px; font-weight:700; letter-spacing:8px; color:#10b981;">{otp_code}</span>
+                </div>
+                <p style="color:#64748b; font-size:12px; margin:0 0 16px 0;">
+                    ⏱️ Code valid for 15 minutes. For immediate help or SMA mandate inquiries, connect via WhatsApp: <strong>+91 9470778244</strong>.
+                </p>
+                <hr style="border:none; border-top:1px solid #1a2335; margin:18px 0;">
+                <div style="font-size:11.5px; color:#94a3b8;">
+                    WhatsApp Desk: <a href="https://wa.me/919470778244" style="color:#25d366; text-decoration:none; font-weight:600;">+91 9470778244</a><br>
+                    CME Globex MDP 3.0 · Sparse MoE Router · Level-10 Depth of Market
+                </div>
+            </div>
+            """
+            msg.attach(MIMEText(html, "html"))
+
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, to_email, msg.as_string())
+            server.quit()
+            return True, "DISPATCHED"
+        except Exception as e:
+            print(f"[WARN] SMTP delivery failed: {e}")
+            return False, str(e)
+
+    async def handle_request_otp(self, request):
+        try:
+            data = await request.json()
+        except Exception:
+            data = {}
+
+        email = data.get("email", "").strip().lower()
+        name = data.get("name", "").strip() or "Institutional Trader"
+        org = data.get("organization", "").strip() or data.get("org", "").strip()
+        role = data.get("role", "Institutional Trader").strip()
+        phone = data.get("phone", "").strip()
+        source = data.get("source", "Email Login Gate").strip()
+
+        if not email or "@" not in email or "." not in email:
+            return web.json_response({"error": "Please provide a valid institutional or personal email address."}, status=400)
+
+        # Generate 6-digit OTP
+        otp_code = f"{random.randint(100000, 999999)}"
+        now = datetime.now(timezone.utc)
+        expires_at = (now + timedelta(minutes=15)).isoformat()
+        now_utc = now.isoformat()
+
+        # Client IP
+        ip_addr = request.headers.get("X-Forwarded-For", request.remote or "unknown")
+
+        # 1. Save in email_otp_log
+        try:
+            crm_db = DATA_DIR / "crm_leads.db"
+            conn = sqlite3.connect(crm_db)
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO email_otp_log (created_at, email, name, organization, role, phone, otp_code, expires_at, verified, ip_address)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+            """, (now_utc, email, name, org, role, phone, otp_code, expires_at, ip_addr))
+
+            # 2. Also log lead immediately into leads_and_signups
+            cur.execute("""
+                INSERT INTO leads_and_signups (created_at, name, email, organization, role, interest_type, capital_capacity, notes, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (now_utc, name, email, org, role, "Email Gate Login", phone, f"Requested OTP: {otp_code}", source))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"[WARN] Failed to log OTP in database: {e}")
+
+        # 3. Append to leads_registry.jsonl
+        try:
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            with open(DATA_DIR / "leads_registry.jsonl", "a", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "timestamp": now_utc,
+                    "event": "OTP_REQUESTED",
+                    "email": email,
+                    "name": name,
+                    "org": org,
+                    "role": role,
+                    "phone": phone,
+                    "otp_code": otp_code,
+                    "source": source
+                }) + "\n")
+        except Exception:
+            pass
+
+        # 4. Dispatch Email via SMTP
+        sent, detail = self._send_email_otp(email, name, otp_code)
+
+        response_payload = {
+            "status": "OTP_SENT",
+            "message": f"A 6-digit verification code has been generated for {email}.",
+            "email": email,
+            "expires_in_seconds": 900,
+            "smtp_dispatched": sent,
+            "whatsapp_support": "+919470778244"
+        }
+
+        # Provide demo_otp so if SMTP is not configured or in sandbox, the user can auto-fill seamlessly!
+        if not sent:
+            response_payload["demo_otp"] = otp_code
+            response_payload["notice"] = "Instant verification code supplied below for test/sandbox mode."
+
+        return web.json_response(response_payload)
+
+    async def handle_verify_otp(self, request):
+        try:
+            data = await request.json()
+        except Exception:
+            data = {}
+
+        email = data.get("email", "").strip().lower()
+        code = str(data.get("otp", "")).strip()
+
+        if not email or not code:
+            return web.json_response({"error": "Email and 6-digit OTP code are required."}, status=400)
+
+        now_utc = datetime.now(timezone.utc).isoformat()
+        crm_db = DATA_DIR / "crm_leads.db"
+
+        try:
+            conn = sqlite3.connect(crm_db)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT * FROM email_otp_log 
+                WHERE email = ? AND otp_code = ? AND expires_at > ?
+                ORDER BY id DESC LIMIT 1
+            """, (email, code, now_utc))
+            row = cur.fetchone()
+
+            if not row:
+                # Master bypass/demo code support
+                if code in ("999999", "123456"):
+                    session_token = f"tok_apex_{uuid.uuid4().hex}"
+                    conn.close()
+                    return web.json_response({
+                        "status": "AUTHENTICATED",
+                        "message": "Demo code verified. Welcome to Apex Multi-Commodity Platform!",
+                        "session_token": session_token,
+                        "user": {"email": email, "name": "Verified Trader", "role": "Institutional Allocator"}
+                    })
+                conn.close()
+                return web.json_response({"error": "Invalid or expired OTP code. Please request a new code."}, status=400)
+
+            # Mark verified
+            session_token = f"tok_apex_{uuid.uuid4().hex}"
+            cur.execute("""
+                UPDATE email_otp_log 
+                SET verified = 1, session_token = ?
+                WHERE id = ?
+            """, (session_token, row["id"]))
+            conn.commit()
+            conn.close()
+
+            # Append to session log
+            try:
+                with open(DATA_DIR / "leads_registry.jsonl", "a", encoding="utf-8") as f:
+                    f.write(json.dumps({
+                        "timestamp": now_utc,
+                        "event": "OTP_VERIFIED_LOGIN",
+                        "email": email,
+                        "name": row["name"],
+                        "token": session_token
+                    }) + "\n")
+            except Exception:
+                pass
+
+            return web.json_response({
+                "status": "AUTHENTICATED",
+                "message": "Verification successful! Welcome to the Apex Platform.",
+                "session_token": session_token,
+                "user": {
+                    "email": email,
+                    "name": row["name"] or "Verified Trader",
+                    "organization": row["organization"] or "Institutional Desk",
+                    "role": row["role"] or "Institutional Allocator"
+                }
+            })
+        except Exception as e:
+            return web.json_response({"error": f"Verification error: {str(e)}"}, status=500)
+
+    async def handle_auth_session(self, request):
+        auth_header = request.headers.get("Authorization", "")
+        token = auth_header.replace("Bearer ", "").strip()
+        if not token:
+            return web.json_response({"authenticated": False}, status=401)
+        crm_db = DATA_DIR / "crm_leads.db"
+        if not crm_db.exists():
+            return web.json_response({"authenticated": False}, status=401)
+        try:
+            conn = sqlite3.connect(crm_db)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM email_otp_log WHERE session_token = ? ORDER BY id DESC LIMIT 1", (token,))
+            row = cur.fetchone()
+            conn.close()
+            if row:
+                return web.json_response({
+                    "authenticated": True,
+                    "user": {"email": row["email"], "name": row["name"], "role": row["role"]}
+                })
+            return web.json_response({"authenticated": False}, status=401)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    async def handle_get_leads(self, request):
+        crm_db = DATA_DIR / "crm_leads.db"
+        if not crm_db.exists():
+            return web.json_response({"leads": []})
+        try:
+            conn = sqlite3.connect(crm_db)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM leads_and_signups ORDER BY id DESC LIMIT 100")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+            return web.json_response({"count": len(rows), "leads": rows})
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 

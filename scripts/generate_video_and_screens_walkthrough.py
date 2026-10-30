@@ -39,10 +39,30 @@ def run_walkthrough():
         )
         page = context.new_page()
 
+        # Step 0: Handle Free Email Login OTP Gate
+        print("▶ Step 0: Checking Free Email Login OTP Gate...")
+        page.goto(LIVE_URL, wait_until="domcontentloaded", timeout=45000)
+        page.wait_for_timeout(2000)
+        if page.is_visible("#authGateBackdrop"):
+            print("   🔒 Auth Gate active — capturing login intake...")
+            page.screenshot(path=str(SCREENS_DIR / "auth_gate_login_modal_view.png"), full_page=False)
+            page.fill("#auth-name", "Alexander Vance")
+            page.fill("#auth-email", "alexander@meridiancap.com")
+            page.fill("#auth-phone", "+91 9470778244")
+            page.click("button:has-text('Send Free Login OTP')")
+            page.wait_for_timeout(1500)
+            if page.is_visible("#auth-demo-banner"):
+                page.click("#auth-demo-banner")
+            else:
+                page.fill("#auth-otp", "999999")
+            page.wait_for_timeout(800)
+            page.screenshot(path=str(SCREENS_DIR / "auth_gate_otp_step2_view.png"), full_page=False)
+            page.click("button:has-text('Verify & Unlock Live Dashboard')")
+            page.wait_for_timeout(2000)
+            print("   🔓 Auth Gate verified — dashboard unlocked!")
+
         # Step 1: Master Cockpit Load (TradingView Chart + MBP-10 DOM)
         print("▶ Step 1: Loading Master Multi-Commodity Cockpit...")
-        page.goto(LIVE_URL, wait_until="domcontentloaded", timeout=45000)
-        page.wait_for_timeout(3500)
         page.screenshot(path=str(SCREENS_DIR / "01_master_cockpit_gold_view.png"), full_page=False)
         print("   ✅ Captured: 01_master_cockpit_gold_view.png")
 

@@ -550,6 +550,92 @@
       transform: translateY(-2px);
       box-shadow: 0 12px 30px rgba(2, 132, 199, 0.65);
     }
+
+    /* Floating WhatsApp Direct Connect Trigger */
+    .floating-whatsapp {
+      position: fixed;
+      bottom: 20px; right: 195px;
+      z-index: 999;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 9999px;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+      transition: all 0.2s ease;
+    }
+    .floating-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.65);
+      color: #fff;
+    }
+    @media (max-width: 900px) {
+      .floating-whatsapp { right: 20px; bottom: 70px; }
+    }
+
+    .btn-whatsapp-header {
+      background: rgba(37, 211, 102, 0.12);
+      color: #25D366;
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-whatsapp-header:hover {
+      background: rgba(37, 211, 102, 0.22);
+      border-color: #25D366;
+      color: #fff;
+    }
+
+    /* Fullscreen Auth Gate */
+    .auth-gate-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 8, 14, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-gate-card {
+      background: #0d121c;
+      border: 1px solid #1e293b;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 45px rgba(6, 182, 212, 0.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      padding: 30px;
+      position: relative;
+    }
+    .otp-code-input {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 12px;
+      text-align: center;
+      padding: 12px;
+      background: #07090e;
+      border: 2px solid var(--accent-cyan);
+      border-radius: 8px;
+      color: var(--green);
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -568,7 +654,14 @@
       <div class="db-badge">⚡ COLO: <b>34.2 µs</b></div>
       <div class="db-badge">ROUTER: <b>0.19 ms MoE</b></div>
       <div class="db-badge" style="color:var(--accent-gold);">ARCHITECT: <b>Bhaskar Pandey</b></div>
+      <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20connecting%20from%20Apex%20CME%20Cockpit" target="_blank" class="btn-whatsapp-header" title="Direct WhatsApp connection to 9470778244">
+        <span>💬</span> WA: +91 9470778244
+      </a>
       <div class="db-badge" id="live-clock">--:--:-- UTC</div>
+      <div id="user-session-badge" style="display:none; align-items:center; gap:6px;">
+        <span class="db-badge" style="color:var(--green);"><span style="color:var(--green);">●</span> <span id="user-display-email">trader@fund.com</span></span>
+        <button class="btn-subtle" onclick="logoutSession()" style="padding:3px 7px; font-size:10.5px;">Switch</button>
+      </div>
       <button class="btn-subtle" onclick="openMemoModal()">📄 Pre-Market Memo</button>
       <button class="btn-gold" onclick="openLeadModal()">⚡ Request Allocator Pilot</button>
     </div>
@@ -996,11 +1089,103 @@ df = data.to_df()
 
   </main>
 
+  <!-- Floating WhatsApp Hotline Button -->
+  <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20I%20am%20exploring%20the%20Apex%20CME%20Multi-Commodity%20Platform%20and%20would%20like%20to%20connect%20regarding%20..." target="_blank" class="floating-whatsapp" title="Chat on WhatsApp with Bhaskar (+91 9470778244)">
+    <span style="font-size:15px;">💬</span>
+    <span>WhatsApp: 9470778244</span>
+  </a>
+
   <!-- Floating Feedback Button -->
   <button class="floating-fab" onclick="openFeedbackModal()">
-    <span>💬</span>
-    <span>Give Feedback / Connect</span>
+    <span>📝</span>
+    <span>Give Feedback</span>
   </button>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 0: FREE EMAIL LOGIN OTP & ACCESS CAPTURE GATE                       -->
+  <!-- ========================================================================= -->
+  <div class="auth-gate-backdrop" id="authGateBackdrop" style="display:none;">
+    <div class="auth-gate-card">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); border-radius:9999px; padding:4px 14px; margin-bottom:10px;">
+          <span style="color:var(--accent-cyan); font-weight:800;">Δ</span>
+          <span style="font-size:11px; font-weight:700; color:var(--accent-cyan); letter-spacing:0.05em;">INSTITUTIONAL ACCESS GATEWAY</span>
+        </div>
+        <h2 style="font-size:22px; font-weight:800; color:#fff;">Apex Multi-Commodity Cockpit</h2>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-top:6px; line-height:1.5;">
+          Enter your details below to receive a <b>free instant login OTP</b> and unlock real-time Databento CME Globex orderbook depth, TradingView charts, and the Sparse MoE engine.
+        </p>
+      </div>
+
+      <!-- Step 1: Request OTP Form -->
+      <div id="authStep1">
+        <div class="form-row">
+          <label>Full Name *</label>
+          <input type="text" id="auth-name" placeholder="e.g. Alexander Vance" required>
+        </div>
+        <div class="form-row">
+          <label>Work / Personal Email *</label>
+          <input type="email" id="auth-email" placeholder="e.g. alexander@quantumcapital.com" required>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-row">
+            <label>Professional Role</label>
+            <select id="auth-role">
+              <option value="Institutional Allocator">Institutional Allocator</option>
+              <option value="Hedge Fund PM">Hedge Fund PM</option>
+              <option value="Quant Researcher">Quant Researcher</option>
+              <option value="Prop Trader">Prop Trader</option>
+              <option value="Individual Investor">Individual Investor</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>WhatsApp / Mobile (Optional)</label>
+            <input type="tel" id="auth-phone" placeholder="e.g. +91 9470778244">
+          </div>
+        </div>
+
+        <button class="btn-gold" style="width:100%; padding:12px; font-size:14px; font-weight:800; justify-content:center; margin-top:8px;" onclick="requestLoginOtp()">
+          ⚡ Send Free Login OTP
+        </button>
+        <div id="auth-step1-error" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+
+        <!-- Direct WhatsApp option -->
+        <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--card-border); text-align:center;">
+          <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">Prefer instant access or have an SMA mandate inquiry?</p>
+          <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20I%20am%20at%20the%20Apex%20login%20gate%20and%20requesting%20platform%20access." target="_blank" class="btn-whatsapp-header" style="width:100%; justify-content:center; padding:9px 14px; font-size:12.5px;">
+            <span>💬</span> Connect Directly on WhatsApp: +91 9470778244
+          </a>
+        </div>
+      </div>
+
+      <!-- Step 2: Verify OTP Form -->
+      <div id="authStep2" style="display:none;">
+        <div style="background:#07090e; border:1px solid var(--card-border); border-radius:8px; padding:12px; margin-bottom:16px; text-align:center;">
+          <span style="font-size:12px; color:var(--text-muted);">Verification code generated for:</span><br>
+          <b id="auth-target-email" style="color:var(--accent-cyan); font-size:13.5px;"></b>
+        </div>
+
+        <div id="auth-demo-banner" style="display:none; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:12px; text-align:center; cursor:pointer;" onclick="autoFillDemoOtp()">
+          💡 <b>Instant Verification Code:</b> <span id="auth-demo-code" style="color:var(--green); font-family:var(--font-mono); font-size:15px; font-weight:800; letter-spacing:2px;"></span> <span style="color:var(--accent-cyan); text-decoration:underline; font-size:11px; margin-left:6px;">(Click to auto-fill)</span>
+        </div>
+
+        <div class="form-row">
+          <label style="text-align:center; margin-bottom:8px;">Enter 6-Digit Verification Code</label>
+          <input type="text" id="auth-otp" class="otp-code-input" maxlength="6" placeholder="------" required>
+        </div>
+
+        <button class="btn-action btn-green" style="width:100%; padding:12px; font-size:14px; font-weight:800; justify-content:center; margin-top:8px;" onclick="verifyLoginOtp()">
+          🚀 Verify & Unlock Live Dashboard
+        </button>
+        <div id="auth-step2-error" style="color:var(--red); font-size:12px; margin-top:10px; display:none;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; font-size:11.5px;">
+          <button class="btn-subtle" onclick="backToStep1()" style="padding:4px 8px;">← Change Email</button>
+          <button class="btn-subtle" onclick="resendOtp()" style="padding:4px 8px;">🔄 Resend Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================================================= -->
   <!-- MODAL 1: INSTITUTIONAL ALLOCATOR LEAD CAPTURE                             -->
@@ -1504,8 +1689,154 @@ df = data.to_df()
       });
     }
 
+    // =========================================================================
+    // AUTHENTICATION & EMAIL LOGIN OTP GATE
+    // =========================================================================
+    let currentAuthEmail = '';
+    let currentDemoOtp = '';
+
+    function checkAuthSession() {
+      const sessionStr = localStorage.getItem('apex_user_session');
+      if (sessionStr) {
+        try {
+          const sess = JSON.parse(sessionStr);
+          if (sess && sess.email) {
+            document.getElementById('authGateBackdrop').style.display = 'none';
+            const userBadge = document.getElementById('user-session-badge');
+            const displayEmail = document.getElementById('user-display-email');
+            if (userBadge && displayEmail) {
+              displayEmail.innerText = sess.name ? `${sess.name} (${sess.email})` : sess.email;
+              userBadge.style.display = 'inline-flex';
+            }
+            return true;
+          }
+        } catch(e) {}
+      }
+      // Show login OTP gate modal
+      document.getElementById('authGateBackdrop').style.display = 'flex';
+      return false;
+    }
+
+    async function requestLoginOtp() {
+      const name = document.getElementById('auth-name').value.trim();
+      const email = document.getElementById('auth-email').value.trim();
+      const role = document.getElementById('auth-role').value;
+      const phone = document.getElementById('auth-phone').value.trim();
+      const errBox = document.getElementById('auth-step1-error');
+      errBox.style.display = 'none';
+
+      if (!email || !email.includes('@')) {
+        errBox.innerText = 'Please enter a valid work or personal email address.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/auth/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, role, phone, source: 'Web Portal Gate' })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errBox.innerText = data.error || 'Failed to generate login OTP.';
+          errBox.style.display = 'block';
+          return;
+        }
+
+        currentAuthEmail = email;
+        document.getElementById('auth-target-email').innerText = email;
+        document.getElementById('authStep1').style.display = 'none';
+        document.getElementById('authStep2').style.display = 'block';
+
+        if (data.demo_otp) {
+          currentDemoOtp = data.demo_otp;
+          document.getElementById('auth-demo-code').innerText = data.demo_otp;
+          document.getElementById('auth-demo-banner').style.display = 'block';
+        } else {
+          document.getElementById('auth-demo-banner').style.display = 'none';
+        }
+        document.getElementById('auth-otp').focus();
+      } catch (err) {
+        errBox.innerText = 'Network error while contacting authentication gateway: ' + err.message;
+        errBox.style.display = 'block';
+      }
+    }
+
+    function autoFillDemoOtp() {
+      if (currentDemoOtp) {
+        document.getElementById('auth-otp').value = currentDemoOtp;
+      }
+    }
+
+    function backToStep1() {
+      document.getElementById('authStep2').style.display = 'none';
+      document.getElementById('authStep1').style.display = 'block';
+    }
+
+    function resendOtp() {
+      requestLoginOtp();
+    }
+
+    async function verifyLoginOtp() {
+      const otp = document.getElementById('auth-otp').value.trim();
+      const errBox = document.getElementById('auth-step2-error');
+      errBox.style.display = 'none';
+
+      if (!otp || otp.length < 4) {
+        errBox.innerText = 'Please enter the 6-digit verification code.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentAuthEmail, otp: otp })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errBox.innerText = data.error || 'Invalid or expired code.';
+          errBox.style.display = 'block';
+          return;
+        }
+
+        // Save session in localStorage
+        localStorage.setItem('apex_user_session', JSON.stringify({
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role,
+          token: data.session_token,
+          verified_at: new Date().toISOString()
+        }));
+
+        // Hide gate & show session in header
+        document.getElementById('authGateBackdrop').style.display = 'none';
+        const userBadge = document.getElementById('user-session-badge');
+        const displayEmail = document.getElementById('user-display-email');
+        if (userBadge && displayEmail) {
+          displayEmail.innerText = data.user.name ? `${data.user.name} (${data.user.email})` : data.user.email;
+          userBadge.style.display = 'inline-flex';
+        }
+      } catch (err) {
+        errBox.innerText = 'Verification failed: ' + err.message;
+        errBox.style.display = 'block';
+      }
+    }
+
+    function logoutSession() {
+      localStorage.removeItem('apex_user_session');
+      const userBadge = document.getElementById('user-session-badge');
+      if (userBadge) userBadge.style.display = 'none';
+      document.getElementById('authGateBackdrop').style.display = 'flex';
+      document.getElementById('authStep2').style.display = 'none';
+      document.getElementById('authStep1').style.display = 'block';
+    }
+
     // Startup
     window.addEventListener('DOMContentLoaded', () => {
+      checkAuthSession();
       initChart();
       loadDepth10('GC');
       connectWS();
