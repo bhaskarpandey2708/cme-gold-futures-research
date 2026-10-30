@@ -112,6 +112,32 @@ def init_crm_db():
             notes TEXT
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            name TEXT,
+            email TEXT,
+            feedback_type TEXT,
+            rating INTEGER,
+            message TEXT NOT NULL,
+            source TEXT
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS leads_and_signups (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            organization TEXT,
+            role TEXT,
+            interest_type TEXT,
+            capital_capacity TEXT,
+            notes TEXT,
+            source TEXT
+        )
+    """)
     conn.commit()
     conn.close()
 
