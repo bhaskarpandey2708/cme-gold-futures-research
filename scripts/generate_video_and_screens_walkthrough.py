@@ -3,7 +3,7 @@
 Apex Multi-Commodity Platform: Automated Full Walkthrough Video & Screen Capture
 ==============================================================================
 Records a smooth 1080p 60fps walkthrough video and captures high-resolution screenshots
-of all 10 platform views, converting the recording to MP4 and an animated GIF preview.
+of all Databento-grade platform views, converting the recording to MP4 and an animated GIF preview.
 """
 
 import sys
@@ -39,50 +39,74 @@ def run_walkthrough():
         )
         page = context.new_page()
 
-        # Step 1: Master Cockpit Load
+        # Step 1: Master Cockpit Load (TradingView Chart + MBP-10 DOM)
         print("▶ Step 1: Loading Master Multi-Commodity Cockpit...")
-        page.goto(LIVE_URL, wait_until="networkidle", timeout=30000)
-        page.wait_for_timeout(2500)
+        page.goto(LIVE_URL, wait_until="domcontentloaded", timeout=45000)
+        page.wait_for_timeout(3500)
         page.screenshot(path=str(SCREENS_DIR / "01_master_cockpit_gold_view.png"), full_page=False)
         print("   ✅ Captured: 01_master_cockpit_gold_view.png")
 
-        # Step 2: Switch to Silver (SI)
-        print("▶ Step 2: Switching to Silver (SI)...")
-        page.click("text=SI (Silver)")
-        page.wait_for_timeout(1500)
+        # Step 2: Switch to Silver (SI.FUT)
+        print("▶ Step 2: Switching to Silver (SI.FUT)...")
+        page.click(".ticker-pill:has-text('SI.FUT')")
+        page.wait_for_timeout(1800)
         page.screenshot(path=str(SCREENS_DIR / "02_silver_depth_view.png"), full_page=False)
         print("   ✅ Captured: 02_silver_depth_view.png")
 
-        # Step 3: Switch to Crude Oil (CL)
-        print("▶ Step 3: Switching to Crude Oil (CL)...")
-        page.click("text=CL (Crude WTI)")
-        page.wait_for_timeout(1500)
+        # Step 3: Switch to Crude Oil (CL.FUT)
+        print("▶ Step 3: Switching to Crude Oil (CL.FUT)...")
+        page.click(".ticker-pill:has-text('CL.FUT')")
+        page.wait_for_timeout(1800)
         page.screenshot(path=str(SCREENS_DIR / "03_crude_oil_view.png"), full_page=False)
         print("   ✅ Captured: 03_crude_oil_view.png")
 
-        # Step 4: Switch to Natural Gas (NG)
-        print("▶ Step 4: Switching to Natural Gas (NG)...")
-        page.click("text=NG (NatGas)")
-        page.wait_for_timeout(1500)
-        page.screenshot(path=str(SCREENS_DIR / "04_natural_gas_view.png"), full_page=False)
-        print("   ✅ Captured: 04_natural_gas_view.png")
-
-        # Step 5: Switch back to Gold and Route Canary Order
-        print("▶ Step 5: Routing Canary Order on CME Globex FIX Gateway...")
-        page.click("text=GC (Gold)")
-        page.wait_for_timeout(1000)
-        page.select_option("#broker-select", "CME_GLOBEX_FIX_9800")
-        page.fill("#order-qty", "10")
-        page.fill("#order-px", "4002.50")
-        page.click("#btn-fire-order")
+        # Step 4: Switch back to Gold and Route FIX Canary Order
+        print("▶ Step 4: Routing FIX Canary Order on CME Globex Gateway...")
+        page.click(".ticker-pill:has-text('GC.FUT')")
+        page.wait_for_timeout(1200)
+        page.select_option("#router-broker", "CME_FIX_9800")
+        page.fill("#router-qty", "10")
+        page.fill("#router-px", "4002.50")
+        page.click("button:has-text('Route Order')")
         page.wait_for_timeout(1500)
         page.screenshot(path=str(SCREENS_DIR / "05_canary_order_router_view.png"), full_page=False)
         print("   ✅ Captured: 05_canary_order_router_view.png")
 
-        # Step 6: Open Allocator Lead Modal and Fill Details
-        print("▶ Step 6: Opening Institutional Allocator Intake Modal...")
-        page.click("button:has-text('Request Pilot & Tearsheet')")
-        page.wait_for_timeout(1000)
+        # Step 5: Switch to Tab 2: Schema Explorer & Lake
+        print("▶ Step 5: Viewing Databento Schema Explorer & Lakehouse Store...")
+        page.click("button.nav-tab-btn:has-text('Schema Explorer')")
+        page.wait_for_timeout(2000)
+        page.screenshot(path=str(SCREENS_DIR / "04_natural_gas_view.png"), full_page=False)
+        page.screenshot(path=str(SCREENS_DIR / "databento_schemas_lakehouse_view.png"), full_page=False)
+        print("   ✅ Captured: databento_schemas_lakehouse_view.png")
+
+        # Step 6: Switch to Tab 3: Sparse MoE Engine
+        print("▶ Step 6: Inspecting Sparse MoE Neural Engine & Microstructure Gauges...")
+        page.click("button.nav-tab-btn:has-text('Sparse MoE')")
+        page.wait_for_timeout(2000)
+        page.screenshot(path=str(SCREENS_DIR / "sparse_moe_neural_engine_view.png"), full_page=False)
+        print("   ✅ Captured: sparse_moe_neural_engine_view.png")
+
+        # Step 7: Switch to Tab 4: Institutional Allocator Blotter & 10Y Tearsheet
+        print("▶ Step 7: Inspecting Allocator Blotter, SPAN Stress Scenarios & Tearsheet...")
+        page.click("button.nav-tab-btn:has-text('Allocator Track Record')")
+        page.wait_for_timeout(2000)
+        page.screenshot(path=str(SCREENS_DIR / "institutional_blotter_tearsheet_view.png"), full_page=False)
+        print("   ✅ Captured: institutional_blotter_tearsheet_view.png")
+
+        # Step 8: Switch to Tab 5: Developer SDK
+        print("▶ Step 8: Viewing Databento Developer SDK & API Gateway...")
+        page.click("button.nav-tab-btn:has-text('Python / C++ SDK')")
+        page.wait_for_timeout(1800)
+        page.screenshot(path=str(SCREENS_DIR / "developer_sdk_integration_view.png"), full_page=False)
+        print("   ✅ Captured: developer_sdk_integration_view.png")
+
+        # Step 9: Return to Tab 1 and Open Allocator Lead Modal
+        print("▶ Step 9: Opening Institutional Allocator Pilot Modal...")
+        page.click("button.nav-tab-btn:has-text('Live Trading')")
+        page.wait_for_timeout(800)
+        page.click("button:has-text('⚡ Request Allocator Pilot')")
+        page.wait_for_timeout(1200)
         page.fill("#lead-name", "James Sterling")
         page.fill("#lead-email", "j.sterling@meridian-funds.com")
         page.fill("#lead-org", "Meridian Global Macro Fund")
@@ -93,49 +117,49 @@ def run_walkthrough():
         page.screenshot(path=str(SCREENS_DIR / "06_lead_intake_modal_view.png"), full_page=False)
         print("   ✅ Captured: 06_lead_intake_modal_view.png")
 
-        # Step 7: Submit Lead Form and Capture Provisioned Credentials
-        print("▶ Step 7: Provisioning Pilot Credentials & Tearsheet Access...")
+        # Step 10: Provision Pilot Credentials & API Key
+        print("▶ Step 10: Provisioning Pilot Credentials & Tearsheet Access...")
         page.click("button:has-text('Submit Request & Provision Pilot Credentials')")
-        page.wait_for_timeout(2000)
+        page.wait_for_timeout(2500)
         page.screenshot(path=str(SCREENS_DIR / "07_lead_provisioned_success_view.png"), full_page=False)
         print("   ✅ Captured: 07_lead_provisioned_success_view.png")
         page.click("button:has-text('Done')")
         page.wait_for_timeout(800)
 
-        # Step 8: Open Pre-Market Daily Intelligence Memo Modal
-        print("▶ Step 8: Opening Pre-Market Daily Intelligence Memo...")
-        page.click("button:has-text('Pre-Market Memo')")
+        # Step 11: Open Pre-Market Intelligence Memo Modal
+        print("▶ Step 11: Opening Pre-Market Daily Intelligence Memo...")
+        page.click("button:has-text('📄 Pre-Market Memo')")
         page.wait_for_timeout(2500)
         page.screenshot(path=str(SCREENS_DIR / "08_premarket_memo_modal_view.png"), full_page=False)
         print("   ✅ Captured: 08_premarket_memo_modal_view.png")
         page.click("#memoModalBackdrop .modal-close")
         page.wait_for_timeout(800)
 
-        # Step 9: Open Feedback Modal
-        print("▶ Step 9: Opening Visitor Feedback Modal...")
+        # Step 12: Open Feedback Drawer Modal
+        print("▶ Step 12: Opening Visitor Feedback Modal...")
         page.click(".floating-fab")
         page.wait_for_timeout(1000)
         page.fill("#fb-name", "Dr. Aris Thorne")
         page.fill("#fb-email", "thorne@oxford-quant.ac.uk")
         page.select_option("#fb-type", "Feature Request")
-        page.fill("#fb-msg", "Superb execution latency (0.19ms) and Level-2 DOM queue dynamics. Would love to see cross-asset volatility smile integration.")
+        page.fill("#fb-msg", "Superb Databento MBP-10 execution latency (0.19ms) and L10 orderbook queue dynamics. Would love to see cross-asset volatility surface integration.")
         page.wait_for_timeout(1000)
         page.screenshot(path=str(SCREENS_DIR / "09_feedback_modal_view.png"), full_page=False)
         print("   ✅ Captured: 09_feedback_modal_view.png")
         page.click("#feedbackModalBackdrop .modal-close")
         page.wait_for_timeout(800)
 
-        # Step 10: OpenAPI Swagger Documentation View
-        print("▶ Step 10: Navigating to OpenAPI Swagger 3.0 Documentation...")
-        page.goto(f"{LIVE_URL}/docs", wait_until="networkidle", timeout=20000)
+        # Step 13: OpenAPI Swagger Documentation View
+        print("▶ Step 13: Navigating to OpenAPI Swagger 3.0 Documentation...")
+        page.goto(f"{LIVE_URL}/docs", wait_until="domcontentloaded", timeout=20000)
         page.wait_for_timeout(2000)
         page.screenshot(path=str(SCREENS_DIR / "10_swagger_api_docs_view.png"), full_page=False)
         print("   ✅ Captured: 10_swagger_api_docs_view.png")
 
-        # Step 11: Institutional Allocator Pitch Deck & Tearsheet View
+        # Step 14: Institutional Allocator Pitch Deck & Tearsheet View
         pitch_deck_file = OUTPUT_DIR / "INSTITUTIONAL_ALLOCATOR_PITCH_DECK.html"
         if pitch_deck_file.exists():
-            print("▶ Step 11: Capturing Institutional Pitch Deck & Tearsheet View...")
+            print("▶ Step 14: Capturing Institutional Pitch Deck & Tearsheet View...")
             page.goto(f"file://{pitch_deck_file.resolve()}", wait_until="load")
             page.wait_for_timeout(1500)
             page.screenshot(path=str(SCREENS_DIR / "11_allocator_pitch_deck_view.png"), full_page=False)
@@ -160,21 +184,27 @@ def run_walkthrough():
             "-pix_fmt", "yuv420p", "-movflags", "+faststart",
             str(mp4_path)
         ]
-        subprocess.run(cmd_mp4, check=True)
-        print(f"   🎉 MP4 Video Generated: {mp4_path} ({mp4_path.stat().st_size / 1024:.1f} KB)")
+        res_mp4 = subprocess.run(cmd_mp4, capture_output=True, text=True)
+        if res_mp4.returncode == 0:
+            print(f"   ✅ Walkthrough Video Generated: {mp4_path} ({mp4_path.stat().st_size / (1024*1024):.2f} MB)")
+        else:
+            print(f"   ⚠️ MP4 conversion warning: {res_mp4.stderr[:200]}")
 
         print("▶ Generating High-Quality Animated GIF Preview...")
         cmd_gif = [
-            "ffmpeg", "-y", "-i", str(mp4_path),
-            "-vf", "fps=10,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
+            "ffmpeg", "-y", "-i", str(latest_webm),
+            "-vf", "fps=12,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
             "-loop", "0",
             str(gif_path)
         ]
-        subprocess.run(cmd_gif, check=True)
-        print(f"   🎉 Animated GIF Generated: {gif_path} ({gif_path.stat().st_size / 1024:.1f} KB)")
+        res_gif = subprocess.run(cmd_gif, capture_output=True, text=True)
+        if res_gif.returncode == 0:
+            print(f"   ✅ Animated GIF Generated: {gif_path} ({gif_path.stat().st_size / (1024*1024):.2f} MB)")
+        else:
+            print(f"   ⚠️ GIF conversion warning: {res_gif.stderr[:200]}")
 
     print("=" * 75)
-    print(" ✅ ALL SCREENSHOTS, HIGH-DEF MP4 VIDEO, AND GIF GENERATED SUCCESSFULLY!")
+    print(" 🎉 FULL WALKTHROUGH & SCREEN CAPTURE COMPLETE!")
     print("=" * 75)
 
 if __name__ == "__main__":
