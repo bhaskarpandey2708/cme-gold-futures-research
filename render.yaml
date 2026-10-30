@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cme-gold-quant-api
+    runtime: python
+    buildCommand: "pip install -r requirements.txt fastapi uvicorn"
+    startCommand: "python3 scripts/quant_api_server.py"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 8085
+    healthCheckPath: /api/v1/health

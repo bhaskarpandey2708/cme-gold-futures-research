@@ -1,0 +1,58 @@
+# Client Deliverables & Sample Datasets
+CLIENT_DELIVERY_7DAYS/
+CLIENT_SHARABLE_SAMPLE_DATASET/
+*.xlsx
+*.csv
+
+# Archives & Deliverables
+*.zip
+*.tar
+*.tar.gz
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# OS-specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Large Raw Market Data (Preserved in Google Drive)
+data/
+*.parquet
+*.dbn.zst
+*.duckdb
+*.db
+!models/*.json
+
+# Model Weights (Synced to Hugging Face Hub)
+models/*.pt
+models/*.pkl
+
+# Logs & PIDs
+logs/
+*.log
+*.pid
+
+# Temporary & Output caches
+output/*.zip
+output/*.parquet
+output/*.csv
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local credentials
+*.key
+*.pem
+.env
+kaggle.json

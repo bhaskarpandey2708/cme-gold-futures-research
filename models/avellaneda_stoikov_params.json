@@ -1,0 +1,21 @@
+{
+  "model_type": "AvellanedaStoikovMarketMaker",
+  "gamma": 0.05,
+  "kappa": 1.5,
+  "A": 140.0,
+  "max_inventory": 10,
+  "tick_size": 0.1,
+  "multiplier": 100.0,
+  "backtest_metrics": {
+    "net_pnl_usd": 30536.0,
+    "total_bids_filled": 20,
+    "total_asks_filled": 28,
+    "total_fills": 48,
+    "max_drawdown_usd": 25828.0,
+    "annualized_sharpe": 106.78,
+    "max_inventory_reached": 10,
+    "final_inventory": -8,
+    "spread_captured_gross": 240.0
+  },
+  "trained_at": "2026-10-23T14:00:40.829719+00:00"
+}

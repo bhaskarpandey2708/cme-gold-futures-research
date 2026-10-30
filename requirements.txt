@@ -1,0 +1,7 @@
+databento>=0.88.0
+pandas>=2.2.0
+pyarrow>=15.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+tqdm>=4.66.0
+zstandard>=0.22.0

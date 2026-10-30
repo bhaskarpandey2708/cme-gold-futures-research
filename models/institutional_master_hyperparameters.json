@@ -1,0 +1,68 @@
+{
+  "version": "2.0.0",
+  "generated_at": "2026-10-30T15:30:00Z",
+  "asset": "CME Gold Futures (GC)",
+  "market_regimes": {
+    "REGIME_1_LOW_VOL_CONSOLIDATION": {
+      "description": "Low Volatility Asian Session Mean Reversion & Tight DOM",
+      "parameters": {
+        "avellaneda_stoikov_gamma": 0.04,
+        "max_inventory_contracts": 5,
+        "vpin_circuit_breaker_threshold": 0.60,
+        "deeplob_conviction_threshold": 0.55,
+        "fractional_kelly_multiplier": 0.40,
+        "dynamic_stop_loss_ticks": 12,
+        "take_profit_ticks": 20
+      }
+    },
+    "REGIME_2_NORMAL_TRENDING": {
+      "description": "Normal Trending Momentum (European & Early US Sessions)",
+      "parameters": {
+        "avellaneda_stoikov_gamma": 0.08,
+        "max_inventory_contracts": 3,
+        "vpin_circuit_breaker_threshold": 0.65,
+        "deeplob_conviction_threshold": 0.60,
+        "fractional_kelly_multiplier": 0.50,
+        "dynamic_stop_loss_ticks": 16,
+        "take_profit_ticks": 36
+      }
+    },
+    "REGIME_3_HIGH_VOL_MACRO_EVENT": {
+      "description": "High Volatility Macro Event (FOMC / CPI / Geopolitical)",
+      "parameters": {
+        "avellaneda_stoikov_gamma": 0.16,
+        "max_inventory_contracts": 1,
+        "vpin_circuit_breaker_threshold": 0.55,
+        "deeplob_conviction_threshold": 0.72,
+        "fractional_kelly_multiplier": 0.25,
+        "dynamic_stop_loss_ticks": 30,
+        "take_profit_ticks": 75
+      }
+    },
+    "REGIME_4_FLASH_CRASH_PREDATORY_FLOW": {
+      "description": "Emergency Safety Override: Predatory Sweeps / Toxic Liquidity Void",
+      "parameters": {
+        "avellaneda_stoikov_gamma": 0.50,
+        "max_inventory_contracts": 0,
+        "vpin_circuit_breaker_threshold": 0.45,
+        "deeplob_conviction_threshold": 0.90,
+        "fractional_kelly_multiplier": 0.00,
+        "dynamic_stop_loss_ticks": 8,
+        "take_profit_ticks": 15,
+        "action_override": "FLATTEN_AND_HALT"
+      }
+    },
+    "REGIME_5_CME_ROLL_EXPIRATION_WEEK": {
+      "description": "CME Front-Month Contract Roll & Calendar Basis Migration",
+      "parameters": {
+        "avellaneda_stoikov_gamma": 0.10,
+        "max_inventory_contracts": 2,
+        "vpin_circuit_breaker_threshold": 0.62,
+        "deeplob_conviction_threshold": 0.65,
+        "fractional_kelly_multiplier": 0.35,
+        "dynamic_stop_loss_ticks": 20,
+        "take_profit_ticks": 40
+      }
+    }
+  }
+}

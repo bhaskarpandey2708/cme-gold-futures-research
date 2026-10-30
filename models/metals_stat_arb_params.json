@@ -1,0 +1,21 @@
+{
+  "engine": "CrossAssetMetalsArbEngine",
+  "primary_pair": "CME Gold Standard (GC) vs CME Micro Gold (MGC)",
+  "adf_t_stat": -7.2303,
+  "adf_pvalue": 0.0,
+  "is_stationary": true,
+  "ou_theta": 0.0416,
+  "ou_half_life_days": 16.65,
+  "ou_equilibrium_mu": -5.63,
+  "ou_diffusion_sigma": 3.2403,
+  "backtest": {
+    "total_trades": 102,
+    "win_rate_pct": 55.88,
+    "net_pnl_usd": 19110.1,
+    "profit_factor": 2.33,
+    "sharpe_ratio": 0.78,
+    "max_drawdown_usd": 6939.99,
+    "avg_holding_days": 19.3
+  },
+  "updated_at": "2026-10-23T14:27:57.659655+00:00"
+}

@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2026-10-23 18:27:25 UTC",
+  "best_hyperparameters": {
+    "alpha_conviction_threshold": 0.277,
+    "vpin_toxicity_limit": 0.586,
+    "avellaneda_gamma": 0.087,
+    "stop_loss_atr_mult": 2.35,
+    "take_profit_atr_mult": 4.85,
+    "max_holding_bars": 20
+  },
+  "composite_fitness_score": -0.9086,
+  "regime_calibrations": {
+    "TRENDING_BULLISH": {
+      "alpha_conviction_threshold": 0.24930000000000002,
+      "vpin_toxicity_limit": 0.586,
+      "avellaneda_gamma": 0.0696,
+      "stop_loss_atr_mult": 2.5850000000000004,
+      "take_profit_atr_mult": 5.819999999999999
+    },
+    "TRENDING_BEARISH": {
+      "alpha_conviction_threshold": 0.24930000000000002,
+      "vpin_toxicity_limit": 0.586,
+      "avellaneda_gamma": 0.0696,
+      "stop_loss_atr_mult": 2.5850000000000004,
+      "take_profit_atr_mult": 5.819999999999999
+    },
+    "MEAN_REVERTING": {
+      "alpha_conviction_threshold": 0.31855,
+      "vpin_toxicity_limit": 0.5274,
+      "avellaneda_gamma": 0.11309999999999999,
+      "stop_loss_atr_mult": 1.9975,
+      "take_profit_atr_mult": 3.6374999999999997
+    },
+    "HIGH_VOLATILITY_TOXIC": {
+      "alpha_conviction_threshold": 0.38780000000000003,
+      "vpin_toxicity_limit": 0.4395,
+      "avellaneda_gamma": 0.1566,
+      "stop_loss_atr_mult": 1.645,
+      "take_profit_atr_mult": 7.2749999999999995
+    }
+  }
+}

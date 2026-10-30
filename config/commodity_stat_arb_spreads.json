@@ -1,0 +1,15 @@
+{
+  "gold_silver_ratio": {
+    "current_gsr": 74.21,
+    "mean_gsr": 78.79,
+    "z_score": -0.36,
+    "ou_half_life_days": 102.7,
+    "regime": "FAIR_VALUE"
+  },
+  "wti_brent_spread": {
+    "current_spread_usd": 8.37,
+    "mean_spread_usd": 3.95,
+    "z_score": 2.18,
+    "regime": "WIDE_BRENT_PREMIUM"
+  }
+}

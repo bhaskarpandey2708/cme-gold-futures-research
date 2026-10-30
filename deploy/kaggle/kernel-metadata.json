@@ -1,0 +1,14 @@
+{
+  "id": "bhaskarpandey/cme-gold-microstructure-t4-training",
+  "title": "CME Gold Microstructure T4 GPU Training Engine",
+  "code_file": "kaggle_train_runner.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

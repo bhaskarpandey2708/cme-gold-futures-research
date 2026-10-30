@@ -1,0 +1,60 @@
+{
+  "overall": {
+    "initial_capital": 250000.0,
+    "final_equity": 6232351.9,
+    "net_pnl": 5982351.9,
+    "total_return_pct": 2392.94,
+    "cagr_pct": 28.6,
+    "sharpe_ratio": 4.82,
+    "sortino_ratio": 6.42,
+    "calmar_ratio": 11.39,
+    "max_drawdown_pct": -2.51,
+    "win_rate_pct": 75.42,
+    "profit_factor": 2.86,
+    "total_bars_tested": 3222,
+    "annualized_volatility_pct": 5.28
+  },
+  "regimes": {
+    "2016_BREXIT_AND_ELECTION": {
+      "name": "2016 Brexit & US Election Volatility",
+      "period": "2016-06-01 to 2016-12-31",
+      "description": "Geopolitical surprise and sovereign risk re-pricing.",
+      "bars": 147,
+      "return_pct": 17.51,
+      "sharpe": 5.1,
+      "max_drawdown_pct": -1.28,
+      "status": "RESILIENT"
+    },
+    "2020_COVID_FLASH_CRASH": {
+      "name": "2020 COVID Liquidity Shock",
+      "period": "2020-02-01 to 2020-06-30",
+      "description": "Extreme margin call cash liquidation followed by historic Fed QE expansion.",
+      "bars": 104,
+      "return_pct": 20.59,
+      "sharpe": 5.37,
+      "max_drawdown_pct": -2.51,
+      "status": "RESILIENT"
+    },
+    "2022_FED_TIGHTENING_CYCLE": {
+      "name": "2022 Aggressive 75bps Rate Hike Cycle",
+      "period": "2022-01-01 to 2022-12-31",
+      "description": "Rapid Fed funds rate hikes and US Dollar index strength.",
+      "bars": 251,
+      "return_pct": 18.41,
+      "sharpe": 3.81,
+      "max_drawdown_pct": -1.18,
+      "status": "RESILIENT"
+    },
+    "2024_2026_ATH_SUPERCYCLE": {
+      "name": "2024-2026 Gold All-Time High Supercycle",
+      "period": "2024-01-01 to 2026-10-23",
+      "description": "Global central bank physical accumulation, de-dollarization, and structural gold rally.",
+      "bars": 708,
+      "return_pct": 166.03,
+      "sharpe": 6.14,
+      "max_drawdown_pct": -2.01,
+      "status": "RESILIENT"
+    }
+  },
+  "timestamp": "2026-10-23T19:39:42.501836+00:00"
+}

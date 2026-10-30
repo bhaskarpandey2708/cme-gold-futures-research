@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "cme-gold-quant": {
+      "command": "/home/ayush-pandey/DATABENTO_RESEARCH/.venv/bin/python3",
+      "args": [
+        "/home/ayush-pandey/DATABENTO_RESEARCH/scripts/quant_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/home/ayush-pandey/DATABENTO_RESEARCH/scripts"
+      }
+    }
+  }
+}

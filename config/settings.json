@@ -1,0 +1,47 @@
+{
+  "system": {
+    "name": "CME Gold Futures Quantitative Intelligence Platform",
+    "version": "4.1.0-PROD",
+    "environment": "production",
+    "target_assets": ["GC=F", "MGC=F", "SI=F"],
+    "base_currency": "USD"
+  },
+  "networking": {
+    "api_port": 8085,
+    "fix_port": 9800,
+    "redis_host": "127.0.0.1",
+    "redis_port": 6379,
+    "ws_heartbeat_sec": 15.0
+  },
+  "execution": {
+    "initial_capital_usd": 250000.0,
+    "max_risk_per_trade_pct": 0.015,
+    "cme_span_margin_per_contract": 9900.0,
+    "cme_maintenance_margin_per_contract": 9000.0,
+    "exchange_fee_per_side_usd": 2.15,
+    "contract_multiplier": 100.0,
+    "tick_size_usd": 0.10,
+    "tick_value_usd": 10.0
+  },
+  "toxicity_defense": {
+    "vpin_bucket_size": 250,
+    "vpin_emergency_pull_threshold": 0.60,
+    "hawkes_branching_ratio_threshold": 0.85,
+    "emergency_quote_pull_latency_ms": 15
+  },
+  "regime_adaptation": {
+    "low_vol_threshold_bps": 10.0,
+    "high_vol_macro_threshold_bps": 30.0,
+    "flash_crash_spread_bps": 0.25,
+    "max_regime_kelly_fraction": 0.35
+  },
+  "storage": {
+    "market_db": "data/market_store.db",
+    "blotter_db": "data/paper_trading_blotter.db",
+    "crm_db": "data/crm_leads.db",
+    "harvested_dir": "data/harvested",
+    "models_dir": "models",
+    "logs_dir": "logs",
+    "output_dir": "output"
+  }
+}
