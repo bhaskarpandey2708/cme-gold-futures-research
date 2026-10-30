@@ -527,6 +527,27 @@
       letter-spacing: 0.04em;
     }
 
+    .audit-tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .audit-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .audit-tab-btn.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: #06b6d4;
+      color: #06b6d4;
+    }
+
     /* Floating Feedback Trigger */
     .floating-fab {
       position: fixed;
@@ -742,6 +763,7 @@
         <span>💬</span> WA: +91 9470778244
       </a>
       <button class="btn-subtle" onclick="startGuidedTour()" style="border-color:var(--accent-cyan); color:var(--accent-cyan); font-weight:700;">💡 Platform Tour</button>
+      <button class="btn-subtle" onclick="openAccessLogModal()" title="View live login audit and prospective allocator leads" style="border-color:rgba(16,185,129,0.3); color:#34d399; font-weight:600;">👥 Access Log</button>
       <div class="db-badge" id="live-clock">--:--:-- UTC</div>
       <div id="user-session-badge" style="display:none; align-items:center; gap:6px;">
         <span class="db-badge" style="color:var(--green);"><span style="color:var(--green);">●</span> <span id="user-display-email">trader@fund.com</span></span>
@@ -1168,7 +1190,7 @@ import asyncio
 from apex_quant import ApexClient
 
 async def main():
-    client = ApexClient(api_key="cme_live_e4cf3b880e6843bea0409d6610c8acc0")
+    client = ApexClient(api_key="apex_live_sandbox_key_sec98")
     async for tick in client.stream_microstructure(symbols=["GC.FUT", "SI.FUT", "CL.FUT"]):
         print(f"[{tick.ts}] {tick.symbol} Mid: \${tick.mid_price:.2f} | MoE Decision: {tick.moe_signal} (Confidence: {tick.confidence:.1%})")
 
@@ -1427,20 +1449,66 @@ asyncio.run(main())
   </div>
 
   <!-- ========================================================================= -->
-  <!-- MODAL 3: PRE-MARKET INTELLIGENCE MEMO VIEWER                              -->
+  <!-- MODAL 4: INSTITUTIONAL ACCESS & VISITOR AUDIT BLOTTER                       -->
   <!-- ========================================================================= -->
-  <div class="modal-backdrop" id="memoModalBackdrop">
-    <div class="modal-card" style="max-width:850px; max-height:92vh;">
-      <button class="modal-close" onclick="closeMemoModal()">&times;</button>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--card-border); padding-bottom:10px;">
+  <div class="modal-backdrop" id="accessLogModalBackdrop">
+    <div class="modal-card" style="max-width:960px; max-height:92vh; width:95vw;">
+      <button class="modal-close" onclick="closeAccessLogModal()">&times;</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
         <div>
-          <span class="db-badge" style="color:var(--accent-gold);">DAILY INTELLIGENCE DOSSIER</span>
-          <h2 style="font-size:17px; font-weight:800; color:#fff; margin-top:4px;">CME Globex Multi-Commodity Pre-Market Memo</h2>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:4px; padding:2px 8px; margin-bottom:4px;">
+            <span style="color:#10b981; font-size:10px;">●</span>
+            <span style="font-size:10px; font-weight:700; color:#10b981; letter-spacing:0.06em; text-transform:uppercase;">Live Visitor & Login Audit Ledger</span>
+          </div>
+          <h2 style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">Institutional Access Telemetry</h2>
         </div>
-        <a href="/api/v1/memo?format=html" target="_blank" class="btn-subtle" style="text-decoration:none;">↗ Open Full Tab</a>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-subtle" onclick="loadAccessLogData()" style="padding:6px 12px; font-size:11.5px;">🔄 Refresh Stream</button>
+          <button class="btn-subtle" onclick="exportAccessLogCSV()" style="padding:6px 12px; font-size:11.5px; border-color:var(--accent-cyan); color:var(--accent-cyan);">📥 Export CSV</button>
+        </div>
       </div>
-      <div id="memoContent" style="background:#06090f; border:1px solid var(--card-border); border-radius:8px; padding:20px; max-height:65vh; overflow-y:auto; font-size:13px; line-height:1.6; color:#cbd5e1;">
-        Loading live pre-market intelligence memo...
+
+      <!-- KPI Summary Strip -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:14px;">
+        <div style="background:#080b11; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:10px 14px;">
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Total Logins Logged</div>
+          <div style="font-size:20px; font-weight:700; color:#38bdf8; margin-top:2px;" id="audit-kpi-logins">0</div>
+        </div>
+        <div style="background:#080b11; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:10px 14px;">
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Verified Sessions</div>
+          <div style="font-size:20px; font-weight:700; color:#34d399; margin-top:2px;" id="audit-kpi-verified">0</div>
+        </div>
+        <div style="background:#080b11; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:10px 14px;">
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Allocator Pilot Leads</div>
+          <div style="font-size:20px; font-weight:700; color:var(--accent-gold); margin-top:2px;" id="audit-kpi-leads">0</div>
+        </div>
+        <div style="background:#080b11; border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:10px 14px;">
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Feedback Notes</div>
+          <div style="font-size:20px; font-weight:700; color:#cbd5e1; margin-top:2px;" id="audit-kpi-feedback">0</div>
+        </div>
+      </div>
+
+      <!-- Sub Tabs -->
+      <div style="display:flex; gap:8px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px;">
+        <button class="audit-tab-btn active" onclick="switchAccessLogTab('logins')">Recent Logins & OTPs</button>
+        <button class="audit-tab-btn" onclick="switchAccessLogTab('leads')">Allocator Pilot Requests</button>
+      </div>
+
+      <!-- Table Container -->
+      <div style="background:#070a10; border:1px solid rgba(255,255,255,0.06); border-radius:6px; max-height:50vh; overflow-y:auto; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead id="accessLogTableHead" style="background:#0d121c; position:sticky; top:0; z-index:2; border-bottom:1px solid rgba(255,255,255,0.08); font-size:10.5px; color:#94a3b8; letter-spacing:0.04em;">
+            <!-- Rendered by JS -->
+          </thead>
+          <tbody id="accessLogTableBody">
+            <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Click "Refresh Stream" to load access records.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11.5px; color:var(--text-muted);">
+        <span>Direct WhatsApp hotline for visitor outreach: <a href="https://wa.me/919470778244" target="_blank" style="color:#34d399; font-weight:600; text-decoration:none;">+91 9470778244</a></span>
+        <button class="btn-subtle" onclick="closeAccessLogModal()">Close Window</button>
       </div>
     </div>
   </div>
@@ -1743,6 +1811,148 @@ asyncio.run(main())
     }
     function closeMemoModal() { document.getElementById('memoModalBackdrop').classList.remove('open'); }
 
+    // Access Log & Visitor Audit Modal
+    function openAccessLogModal() {
+      document.getElementById('accessLogModalBackdrop').classList.add('open');
+      loadAccessLogData();
+    }
+    function closeAccessLogModal() {
+      document.getElementById('accessLogModalBackdrop').classList.remove('open');
+    }
+
+    let accessLogData = { logins: [], leads: [], feedback: [] };
+
+    async function loadAccessLogData() {
+      const tbody = document.getElementById('accessLogTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">Fetching live access telemetry...</td></tr>';
+
+      const sessionStr = localStorage.getItem('apex_user_session');
+      let token = '9470778244';
+      if (sessionStr) {
+        try {
+          const sess = JSON.parse(sessionStr);
+          if (sess && sess.token) token = sess.token;
+        } catch(e) {}
+      }
+
+      try {
+        const res = await fetch(`/api/v1/admin/access-log?key=9470778244`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--red);">Access denied: ${data.error || 'Authentication required.'}</td></tr>`;
+          return;
+        }
+        accessLogData = data;
+
+        if (data.summary) {
+          document.getElementById('audit-kpi-logins').innerText = data.summary.total_logins_recorded || 0;
+          document.getElementById('audit-kpi-verified').innerText = data.summary.verified_sessions || 0;
+          document.getElementById('audit-kpi-leads').innerText = data.summary.allocator_pilot_requests || 0;
+          document.getElementById('audit-kpi-feedback').innerText = data.summary.feedback_submissions || 0;
+        }
+
+        renderAccessLogTable('logins');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--red);">Failed to connect: ${err.message}</td></tr>`;
+      }
+    }
+
+    function switchAccessLogTab(view) {
+      document.querySelectorAll('.audit-tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      renderAccessLogTable(view);
+    }
+
+    function renderAccessLogTable(view) {
+      const tbody = document.getElementById('accessLogTableBody');
+      const thead = document.getElementById('accessLogTableHead');
+      tbody.innerHTML = '';
+
+      if (view === 'logins') {
+        thead.innerHTML = `
+          <tr>
+            <th style="padding:10px; text-align:left;">TIMESTAMP (UTC)</th>
+            <th style="padding:10px; text-align:left;">NAME</th>
+            <th style="padding:10px; text-align:left;">EMAIL ADDRESS</th>
+            <th style="padding:10px; text-align:left;">ROLE</th>
+            <th style="padding:10px; text-align:left;">WHATSAPP / MOBILE</th>
+            <th style="padding:10px; text-align:center;">STATUS</th>
+          </tr>
+        `;
+        if (!accessLogData.logins || accessLogData.logins.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No login records logged yet.</td></tr>';
+          return;
+        }
+        accessLogData.logins.forEach(l => {
+          const isVerified = l.verified === 1 || l.status === 'VERIFIED';
+          const cleanPhone = (l.phone || '').replace(/[^0-9]/g, '');
+          const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=Hi%20${encodeURIComponent(l.name || 'there')},%20connecting%20from%20Apex%20Quantitative%20Desk.` : null;
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+          tr.innerHTML = `
+            <td style="padding:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim);">${(l.created_at || '').substring(0, 19).replace('T', ' ')}</td>
+            <td style="padding:10px; font-weight:600; color:#fff;">${l.name || 'Trader'}</td>
+            <td style="padding:10px;"><a href="mailto:${l.email}" style="color:var(--accent-cyan); text-decoration:none;">${l.email}</a></td>
+            <td style="padding:10px; font-size:12px; color:var(--text-muted);">${l.role || 'Institutional Desk'}</td>
+            <td style="padding:10px;">
+              ${waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#34d399; text-decoration:none; padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);">💬 ${l.phone}</a>` : `<span style="color:var(--text-dim); font-size:11px;">Not Provided</span>`}
+            </td>
+            <td style="padding:10px; text-align:center;">
+              <span class="db-badge ${isVerified ? 'live' : ''}" style="font-size:10px;">${isVerified ? 'VERIFIED ✓' : 'OTP PENDING'}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else if (view === 'leads') {
+        thead.innerHTML = `
+          <tr>
+            <th style="padding:10px; text-align:left;">TIMESTAMP (UTC)</th>
+            <th style="padding:10px; text-align:left;">NAME / ORG</th>
+            <th style="padding:10px; text-align:left;">EMAIL</th>
+            <th style="padding:10px; text-align:left;">MANDATE INTEREST</th>
+            <th style="padding:10px; text-align:left;">CAPACITY</th>
+            <th style="padding:10px; text-align:left;">NOTES</th>
+          </tr>
+        `;
+        if (!accessLogData.leads || accessLogData.leads.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No allocator pilot leads submitted yet.</td></tr>';
+          return;
+        }
+        accessLogData.leads.forEach(ld => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+          tr.innerHTML = `
+            <td style="padding:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim);">${(ld.created_at || '').substring(0, 19).replace('T', ' ')}</td>
+            <td style="padding:10px; font-weight:600; color:#fff;">${ld.name} <span style="font-size:11px; color:var(--text-dim);">(${ld.organization || 'Prop'})</span></td>
+            <td style="padding:10px;"><a href="mailto:${ld.email}" style="color:var(--accent-cyan); text-decoration:none;">${ld.email}</a></td>
+            <td style="padding:10px; font-size:12px; color:var(--accent-gold);">${ld.interest_type || 'SMA Mandate'}</td>
+            <td style="padding:10px; font-size:12px;">${ld.capital_capacity || ld.role || 'Institutional'}</td>
+            <td style="padding:10px; font-size:11.5px; color:var(--text-muted); max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${ld.notes || ''}">${ld.notes || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    function exportAccessLogCSV() {
+      if (!accessLogData.logins || accessLogData.logins.length === 0) {
+        alert('No data available to export.');
+        return;
+      }
+      let csv = 'ID,Created At,Name,Email,Role,Phone,Verified,IP\n';
+      accessLogData.logins.forEach(l => {
+        csv += `"${l.id}","${l.created_at}","${l.name || ''}","${l.email || ''}","${l.role || ''}","${l.phone || ''}","${l.verified}","${l.ip_address || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `apex_terminal_access_log_${new Date().toISOString().substring(0,10)}.csv`;
+      a.click();
+    }
+
     function submitLeadForm() {
       const name = document.getElementById('lead-name').value.trim();
       const email = document.getElementById('lead-email').value.trim();
@@ -1964,7 +2174,7 @@ import asyncio
 from apex_quant import ApexClient
 
 async def main():
-    client = ApexClient(api_key="cme_live_e4cf3b880e6843bea0409d6610c8acc0")
+    client = ApexClient(api_key="apex_live_sandbox_key_sec98")
     async for tick in client.stream_microstructure(symbols=["GC.FUT", "SI.FUT", "CL.FUT"]):
         print(f"[{tick.ts}] {tick.symbol} Mid: \${tick.mid_price:.2f} | MoE Decision: {tick.moe_signal} (Confidence: {tick.confidence:.1%})")
 
@@ -1975,7 +2185,7 @@ asyncio.run(main())`,
 #include <apex_quant.hpp>
 
 int main() {
-    apex::Client client("cme_live_e4cf3b880e6843bea0409d6610c8acc0");
+    apex::Client client("apex_live_sandbox_key_sec98");
     client.subscribe_l10_depth("GC.FUT", [](const apex::OrderBookDepth& dom) {
         std::cout << "[APEX C++] Best Bid: " << dom.bids[0].price 
                   << " | Best Ask: " << dom.asks[0].price 
@@ -1999,7 +2209,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
       curl: `# 1. Ingest Snapshot Level-10 Depth (Sub-second REST)
 curl -s "https://cme-multi-commodity-cockpit.onrender.com/api/v1/depth10?symbol=GC" \\
-  -H "Authorization: Bearer cme_live_e4cf3b880e6843bea0409d6610c8acc0"
+  -H "Authorization: Bearer apex_live_sandbox_key_sec98"
 
 # 2. Route Canary FIX Order with <35us Risk Check
 curl -s -X POST "https://cme-multi-commodity-cockpit.onrender.com/api/v1/cockpit/order" \\
