@@ -545,7 +545,8 @@ class QuantAPIServer:
 
 def main():
     parser = argparse.ArgumentParser(description="CME Gold Institutional Quant API & WebSocket Server")
-    parser.add_argument("--port", type=int, default=8085, help="Port to listen on (default: 8085)")
+    default_port = int(os.getenv("PORT", 8085))
+    parser.add_argument("--port", type=int, default=default_port, help="Port to listen on (default: 8085)")
     args = parser.parse_args()
 
     server = QuantAPIServer()

@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "architecture_version": "2.0.0-MOE-SPARSE",
+  "model_name": "CME_Global_Multi_Asset_Sparse_MoE",
+  "input_dim": 32,
+  "hidden_dim": 128,
+  "output_dim": 64,
+  "num_experts": 5,
+  "top_k_routing": 2,
+  "router": {
+    "top_k": 2,
+    "temperature": 1.0,
+    "aux_loss_coeff": 0.01
+  },
+  "experts": [
+    {
+      "id": 0,
+      "key": "microstructure",
+      "specialization": "LOB Imbalance, Hawkes Intensity & Queue Depletion"
+    },
+    {
+      "id": 1,
+      "key": "cross_asset",
+      "specialization": "Metals (GC/SI/PL/HG), Energy (CL/NG/BZ) & Agri (ZC/ZS/ZW) Lead-Lag"
+    },
+    {
+      "id": 2,
+      "key": "volatility_regime",
+      "specialization": "Regime Adaptive Volatility & VPIN Adverse Selection"
+    },
+    {
+      "id": 3,
+      "key": "macro_yield",
+      "specialization": "US 10Y/2Y Treasury Yield Curves, Inflation Breakevens & DXY"
+    },
+    {
+      "id": 4,
+      "key": "equity_spillover",
+      "specialization": "E-mini S&P 500 & Nasdaq 100 Gamma Imbalance & Macro Shocks"
+    }
+  ],
+  "learning_rate": 0.002,
+  "weight_decay": 0.0001
+}

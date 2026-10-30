@@ -27,7 +27,7 @@ import torch.nn.functional as F
 import numpy as np
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 CONFIG_PATH = BASE_DIR / "config" / "moe" / "moe_hyperparameters.json"
 MODELS_DIR = BASE_DIR / "models" / "moe"
 CKPT_DIR = MODELS_DIR / "checkpoints"

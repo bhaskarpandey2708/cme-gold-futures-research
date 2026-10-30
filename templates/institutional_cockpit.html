@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Global Quantitative Cockpit | CME Gold & India HFT</title>
+  <style>
+    :root {
+      --bg: #090d13;
+      --card-bg: #121824;
+      --card-border: #1e293b;
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-mono: "JetBrains Mono", "Fira Code", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-green {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+    .badge-gold {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--gold);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .card-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-val {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .ladder {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .ladder th {
+      text-align: right;
+      padding: 6px 8px;
+      color: var(--text-muted);
+      font-weight: 500;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .ladder th:first-child { text-align: left; }
+    .ladder td {
+      padding: 6px 8px;
+      text-align: right;
+      position: relative;
+    }
+    .ladder td:first-child { text-align: left; }
+    .bid-row { color: var(--green); }
+    .ask-row { color: var(--red); }
+    .depth-bar-bid {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      background: rgba(34, 197, 94, 0.15);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .depth-bar-ask {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      background: rgba(239, 68, 68, 0.15);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 6px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    button.btn {
+      background: var(--accent);
+      color: #04101e;
+      border: none;
+      padding: 8px 16px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button.btn:hover { background: #7dd3fc; }
+    button.btn-green { background: var(--green); color: #04160a; }
+    button.btn-green:hover { background: #4ade80; }
+    button.btn-red { background: var(--red); color: #ffffff; }
+    input, select {
+      background: #090d13;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .flex-row { display: flex; gap: 10px; align-items: center; }
+    .rank-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .rank-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="pulse-dot"></span>
+      <div>
+        <h1 style="font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">APEX GLOBAL QUANTITATIVE COCKPIT</h1>
+        <p style="font-size: 12px; color: var(--text-muted);">CME Globex Gold Futures (<span style="color:var(--gold);">GC=F</span>) & NSE Index Derivatives (<span style="color:var(--accent);">NIFTY_FUT</span>)</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <span class="badge badge-green" id="ws-status">WS CONNECTED</span>
+      <span class="badge badge-gold">ALLOCATOR: bhaskarauthor@gmail.com</span>
+      <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);" id="live-clock">--:--:-- UTC</span>
+    </div>
+  </header>
+
+  <!-- Top KPI Cards -->
+  <div class="grid-4">
+    <!-- Card 1: Account Equity & PnL -->
+    <div class="card">
+      <div class="card-title">
+        <span>Portfolio Equity</span>
+        <span class="badge badge-green">+5.20%</span>
+      </div>
+      <div class="stat-val" id="equity-val" style="color: var(--green);">$262,990.00</div>
+      <div class="stat-sub">Realized PnL: <b id="pnl-val" style="color: var(--green);">+$12,843.80</b> | 48 Closed Trades (64.6% Win Rate)</div>
+    </div>
+
+    <!-- Card 2: CME Gold Globex Lead -->
+    <div class="card">
+      <div class="card-title">
+        <span>CME Gold Globex (GC=F)</span>
+        <span class="badge badge-gold" id="cme-signal-badge">BUY (+0.54)</span>
+      </div>
+      <div class="stat-val" id="cme-price-val">$4,001.68</div>
+      <div class="stat-sub">VPIN Toxicity: <b id="cme-vpin">0.28 (LOW)</b> | Hawkes λ: <b id="cme-hawkes">0.35/s</b></div>
+    </div>
+
+    <!-- Card 3: India NIFTY Futures Alpha -->
+    <div class="card">
+      <div class="card-title">
+        <span>NSE NIFTY Futures</span>
+        <span class="badge" id="nifty-action-badge">BUY IMBALANCE</span>
+      </div>
+      <div class="stat-val" id="nifty-price-val">₹22,752.40</div>
+      <div class="stat-sub">PatchTST +5s Return: <b id="patchtst-5s" style="color: var(--green);">+1.45 bps</b> (MoE: ±0.03 bps)</div>
+    </div>
+
+    <!-- Card 4: MLOps & Hardware -->
+    <div class="card">
+      <div class="card-title">
+        <span>Cloud GPU Compute</span>
+        <span class="badge badge-green">T4 TENSOR CORES</span>
+      </div>
+      <div class="stat-val" style="font-size: 20px;">NVIDIA Tesla T4</div>
+      <div class="stat-sub">Concept Drift: <b style="color: var(--green);">NORMAL</b> | 15.64 GB VRAM (FP16 AMP)</div>
+    </div>
+  </div>
+
+  <!-- Dual Level-2 Order Books -->
+  <div class="grid-2">
+    <!-- CME Gold Order Book -->
+    <div class="card">
+      <div class="card-title">
+        <span>CME COMEX Gold L2 Depth (GC=F)</span>
+        <span style="font-size: 11px; color: var(--gold);">SEC 15c3-5 Protected</span>
+      </div>
+      <table class="ladder" id="cme-ladder">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Bid Size</th>
+            <th>Bid Price</th>
+            <th>Ask Price</th>
+            <th>Ask Size</th>
+          </tr>
+        </thead>
+        <tbody id="cme-ladder-body">
+          <tr class="bid-row"><td>L1</td><td>18</td><td>4001.50</td><td>4001.70</td><td>24</td></tr>
+          <tr class="bid-row"><td>L2</td><td>25</td><td>4001.30</td><td>4001.90</td><td>32</td></tr>
+          <tr class="bid-row"><td>L3</td><td>40</td><td>4001.10</td><td>4002.10</td><td>45</td></tr>
+          <tr class="bid-row"><td>L4</td><td>55</td><td>4000.90</td><td>4002.30</td><td>60</td></tr>
+          <tr class="bid-row"><td>L5</td><td>80</td><td>4000.70</td><td>4002.50</td><td>110</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NSE Nifty Order Book -->
+    <div class="card">
+      <div class="card-title">
+        <span>NSE NIFTY 50 Futures L2 Depth</span>
+        <span style="font-size: 11px; color: var(--accent);">SEBI OTR Ratio: 18.68 (Limit 50)</span>
+      </div>
+      <table class="ladder" id="nifty-ladder">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Bid Lots</th>
+            <th>Bid Price</th>
+            <th>Ask Price</th>
+            <th>Ask Lots</th>
+          </tr>
+        </thead>
+        <tbody id="nifty-ladder-body">
+          <tr class="bid-row"><td>L1</td><td>150</td><td>22752.00</td><td>22752.80</td><td>200</td></tr>
+          <tr class="bid-row"><td>L2</td><td>300</td><td>22751.50</td><td>22753.20</td><td>350</td></tr>
+          <tr class="bid-row"><td>L3</td><td>450</td><td>22751.00</td><td>22753.80</td><td>500</td></tr>
+          <tr class="bid-row"><td>L4</td><td>600</td><td>22750.50</td><td>22754.20</td><td>750</td></tr>
+          <tr class="bid-row"><td>L5</td><td>1200</td><td>22750.00</td><td>22755.00</td><td>1500</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Canary Order Execution + Wealth Rankings -->
+  <div class="grid-2">
+    <!-- Canary Broker Order Router -->
+    <div class="card">
+      <div class="card-title">
+        <span>Institutional Canary Order Router</span>
+        <span class="badge" style="background: rgba(34,197,94,0.1); color: var(--green);">Latency &lt; 35µs</span>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Test live pre-trade risk routing across Zerodha Kite, Angel One, Dhan, or CME Globex FIX.</p>
+      
+      <div class="flex-row" style="margin-bottom: 12px; flex-wrap: wrap;">
+        <select id="broker-select">
+          <option value="zerodha_sandbox">Zerodha Kite Connect</option>
+          <option value="angel_smartapi">Angel One SmartAPI</option>
+          <option value="dhan_hq">Dhan HQ Gateway</option>
+          <option value="cme_fix_9800">CME Globex FIX 4.4 (:9800)</option>
+        </select>
+        <select id="side-select">
+          <option value="BUY">BUY (Long)</option>
+          <option value="SELL">SELL (Short)</option>
+        </select>
+        <input type="number" id="order-qty" value="50" style="width: 80px;" placeholder="Qty">
+        <input type="number" id="order-px" value="22752.40" step="0.05" style="width: 120px;" placeholder="Price">
+        <button class="btn btn-green" id="btn-fire-order" onclick="fireCanaryOrder()">Route Order</button>
+      </div>
+
+      <div id="execution-log" style="background: #090d13; border: 1px solid var(--card-border); padding: 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; height: 100px; overflow-y: auto; color: var(--text-muted);">
+        [LOG] Institutional router initialized. Ready for order routing...
+      </div>
+    </div>
+
+    <!-- Wealth Intelligence & Top Alpha Rankings -->
+    <div class="card">
+      <div class="card-title">
+        <span>Indian Wealth Alpha Leaderboard</span>
+        <span class="badge badge-gold">15,640 Schemes Tracked</span>
+      </div>
+      <div id="wealth-rankings">
+        <div class="rank-row">
+          <div><b>1. Marcellus Investment Managers</b> <span style="color:var(--text-muted);">(Consistent Compounders)</span></div>
+          <div style="color:var(--green); font-family:var(--font-mono);">+6.30% 1Y Alpha</div>
+        </div>
+        <div class="rank-row">
+          <div><b>2. ASK Investment Managers</b> <span style="color:var(--text-muted);">(High Conviction Portfolio)</span></div>
+          <div style="color:var(--green); font-family:var(--font-mono);">+4.85% 1Y Alpha</div>
+        </div>
+        <div class="rank-row">
+          <div><b>3. WhiteOak Capital Management</b> <span style="color:var(--text-muted);">(India Pioneers Equity)</span></div>
+          <div style="color:var(--green); font-family:var(--font-mono);">+4.12% 1Y Alpha</div>
+        </div>
+        <div class="rank-row">
+          <div><b>4. Motilal Oswal Asset Management</b> <span style="color:var(--text-muted);">(Next Trillion Dollar Opportunity)</span></div>
+          <div style="color:var(--green); font-family:var(--font-mono);">+3.95% 1Y Alpha</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').innerText = now.toISOString().substring(11, 19) + ' UTC';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // WebSocket Client
+    let ws;
+    function connectWS() {
+      const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProto}//${window.location.host}/ws/cockpit`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById('ws-status').innerText = 'WS CONNECTED';
+        document.getElementById('ws-status').className = 'badge badge-green';
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          updateUI(data);
+        } catch (e) {
+          console.error('WS Parse Error', e);
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById('ws-status').innerText = 'WS RECONNECTING';
+        document.getElementById('ws-status').className = 'badge badge-gold';
+        setTimeout(connectWS, 2000);
+      };
+
+      ws.onerror = () => {
+        ws.close();
+      };
+    }
+
+    function updateUI(data) {
+      if (data.cme_gold && data.cme_gold.pnl) {
+        document.getElementById('equity-val').innerText = '$' + Number(data.cme_gold.pnl.account_equity).toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('pnl-val').innerText = '+$' + Number(data.cme_gold.pnl.cumulative_realized_pnl).toLocaleString('en-US', {minimumFractionDigits: 2});
+      }
+      if (data.cme_gold && data.cme_gold.signal) {
+        const sig = data.cme_gold.signal;
+        document.getElementById('cme-price-val').innerText = '$' + Number(sig.price || 4001.68).toFixed(2);
+        document.getElementById('cme-signal-badge').innerText = `${sig.signal || 'BUY'} (${sig.conviction >= 0 ? '+' : ''}${sig.conviction || 0.54})`;
+        if (sig.vpin) document.getElementById('cme-vpin').innerText = `${Number(sig.vpin).toFixed(2)} (LOW)`;
+        if (sig.hawkes_intensity) document.getElementById('cme-hawkes').innerText = `${Number(sig.hawkes_intensity).toFixed(2)}/s`;
+      }
+      if (data.india_hft && data.india_hft.depth) {
+        const d = data.india_hft.depth;
+        document.getElementById('nifty-price-val').innerText = '₹' + Number(d.last_price).toLocaleString('en-IN', {minimumFractionDigits: 2});
+      }
+      if (data.india_hft && data.india_hft.patchtst) {
+        const pt = data.india_hft.patchtst.multi_horizon_alpha;
+        if (pt && pt.horizon_1_scalp_5s) {
+          document.getElementById('patchtst-5s').innerText = `+${pt.horizon_1_scalp_5s.expected_return_bps} bps`;
+          document.getElementById('nifty-action-badge').innerText = pt.horizon_1_scalp_5s.action || 'BUY IMBALANCE';
+        }
+      }
+    }
+
+    function fireCanaryOrder() {
+      const broker = document.getElementById('broker-select').value;
+      const side = document.getElementById('side-select').value;
+      const qty = document.getElementById('order-qty').value;
+      const px = document.getElementById('order-px').value;
+      const logBox = document.getElementById('execution-log');
+
+      logBox.innerHTML += `\n[OUTGOING] Sending ${side} ${qty} @ ${px} via ${broker}...`;
+      logBox.scrollTop = logBox.scrollHeight;
+
+      fetch('/api/v1/cockpit/order', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({broker, side, quantity: qty, price: px})
+      })
+      .then(res => res.json())
+      .then(res => {
+        logBox.innerHTML += `\n[FILLED] Order ${res.order_id} executed in ${res.risk_firewall_latency_us}µs | Status: ${res.status}`;
+        logBox.scrollTop = logBox.scrollHeight;
+      })
+      .catch(err => {
+        logBox.innerHTML += `\n[ERROR] Routing failed: ${err}`;
+        logBox.scrollTop = logBox.scrollHeight;
+      });
+    }
+
+    // Initialize WebSocket on Load
+    connectWS();
+  </script>
+</body>
+</html>

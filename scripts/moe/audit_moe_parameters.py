@@ -24,7 +24,7 @@ import numpy as np
 from datetime import datetime, timezone
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 sys.path.append(str(BASE_DIR / "scripts" / "moe"))
 from multi_asset_moe_engine import MultiAssetMoEModel
 
@@ -157,8 +157,8 @@ def audit_moe_model():
 
     report_payload = {
         "audit_timestamp": datetime.now(timezone.utc).isoformat(),
-        "model_name": config["model_name"],
-        "architecture_version": config["architecture_version"],
+        "model_name": config.get("model_name", "CME_Global_Multi_Asset_Sparse_MoE"),
+        "architecture_version": config.get("architecture_version", "2.0.0-MOE-SPARSE"),
         "overall_status": "APPROVED_FOR_PROD" if overall_passed else "REJECTED_AUDIT_FAILED",
         "compliance_summary": {
             "all_condition_numbers_passed": all_cond_passed,
@@ -177,6 +177,11 @@ def audit_moe_model():
         "layers": layer_audits,
     }
 
+    if AUDIT_JSON.exists():
+        try:
+            AUDIT_JSON.unlink()
+        except Exception:
+            pass
     with open(AUDIT_JSON, "w", encoding="utf-8") as f:
         json.dump(report_payload, f, indent=2)
 
@@ -258,6 +263,11 @@ def generate_markdown_audit_report(data: dict):
         f"*Report certified by Lead AI Architect — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}*",
     ])
 
+    if REPORT_MD.exists():
+        try:
+            REPORT_MD.unlink()
+        except Exception:
+            pass
     REPORT_MD.write_text("\n".join(lines), encoding="utf-8")
 
 
