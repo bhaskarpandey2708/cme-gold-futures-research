@@ -408,30 +408,62 @@ class QuantAPIServer:
             except Exception:
                 pass
 
-        # High-resolution second-by-second (1S), 1M, or 5M continuous microstructure generator
+        # High-resolution market microstructure generator (Realistic Geometric Brownian Motion with regime drift & wicks)
         if not bars:
             import time
-            import math
+            import random
             base_prices = {"GC": 4002.50, "SI": 34.15, "HG": 4.425, "CL": 71.45, "NG": 2.685, "PL": 1024.80, "ZC": 430.50, "ZW": 568.00, "ZS": 1012.25}
             mid = base_prices.get(symbol, 4002.50)
             now = int(time.time()) - (limit * interval)
             
-            # Sub-second tick volatilities
-            vol_scale = 0.0002 if tf == "1s" else (0.0008 if tf == "1m" else 0.002)
-            cur_p = mid * (0.998 if tf == "1s" else 0.985)
-
+            # Tick parameters
+            is_sub10 = mid < 10
+            tick_size = 0.001 if is_sub10 else 0.10
+            decimals = 3 if is_sub10 else 2
+            vol_scale = 0.00012 if tf == "1s" else (0.0005 if tf == "1m" else 0.0012)
+            
+            # Deterministic seed per hour and symbol so chart stays stable on reload
+            hour_epoch = int(time.time() // 3600)
+            seed_val = sum(ord(c) for c in symbol) + hour_epoch
+            rng = random.Random(seed_val)
+            
+            cur_p = mid * (1.0 - rng.uniform(0.0005, 0.0015))
+            momentum = 0.0
+            
             for i in range(limit):
                 step_time = now + (i * interval)
-                drift = (mid - cur_p) * 0.02
-                noise = math.sin(i * 0.45) * (mid * vol_scale) + math.cos(i * 0.85) * (mid * (vol_scale * 0.7))
-                cur_o = round(cur_p, 3 if mid < 10 else 2)
-                cur_c = round(cur_o + drift + noise, 3 if mid < 10 else 2)
-                cur_h = round(max(cur_o, cur_c) + abs(noise * 0.6), 3 if mid < 10 else 2)
-                cur_l = round(min(cur_o, cur_c) - abs(noise * 0.5), 3 if mid < 10 else 2)
                 
-                # Volume per second vs per minute/hour
-                base_vol = 15 if tf == "1s" else (180 if tf == "1m" else 1500)
-                vol = int(base_vol + abs(noise * (base_vol * 1.5)))
+                # Dynamic order-flow regime: micro momentum + mean reversion to VWAP
+                if rng.random() < 0.18:
+                    momentum = rng.gauss(0, mid * vol_scale * 1.5)
+                else:
+                    momentum *= 0.85
+                    
+                dollar_reversion = (mid - cur_p) * 0.015
+                dollar_shock = rng.gauss(0, mid * vol_scale)
+                net_dollar_change = dollar_reversion + momentum + dollar_shock
+                
+                cur_o = round(cur_p, decimals)
+                cur_c = round(cur_o + net_dollar_change, decimals)
+                if cur_c == cur_o:
+                    cur_c = round(cur_o + (tick_size if rng.random() > 0.5 else -tick_size), decimals)
+                
+                # Realistic wicks (high/low rejections beyond open/close)
+                wick_up = abs(rng.gauss(0, mid * vol_scale * 0.8))
+                wick_dn = abs(rng.gauss(0, mid * vol_scale * 0.8))
+                cur_h = round(max(cur_o, cur_c) + wick_up, decimals)
+                cur_l = round(min(cur_o, cur_c) - wick_dn, decimals)
+                
+                # Realistic volume profile
+                try:
+                    bar_range = abs(cur_h - cur_l) / max(mid * vol_scale, 1e-6)
+                    if not (0 <= bar_range <= 100):
+                        bar_range = 1.0
+                except Exception:
+                    bar_range = 1.0
+                base_vol = 14 if tf == "1s" else (160 if tf == "1m" else 1250)
+                vol = max(1, int(base_vol * rng.uniform(0.7, 1.3) * (1.0 + min(bar_range, 2.5))))
+                
                 bars.append({
                     "time": step_time,
                     "open": cur_o,
