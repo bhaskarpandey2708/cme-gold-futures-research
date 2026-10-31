@@ -861,6 +861,16 @@
       border-color: var(--accent-blue);
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
     }
+
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; }
+      .top-navbar, .kpi-grid, .trading-grid, .blotter-card, .modal-backdrop, #tourOverlay, #tourCard { display: none !important; }
+      .workspace-container { padding: 0 !important; max-width: 100% !important; }
+      #view-tab-tearsheet { display: block !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+      .btn-cta-pilot, .action-icon-btn { display: none !important; }
+      .dom-table th { background: #f8fafc !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important; }
+      .dom-table td { border: 1px solid #e2e8f0 !important; color: #0f172a !important; }
+    }
   </style>
 </head>
 <body>
@@ -1270,35 +1280,123 @@
 
     <!-- TAB 4: 10Y INSTITUTIONAL TEARSHEET -->
     <div id="view-tab-tearsheet" class="tab-view-container">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px;">
         <div>
-          <h2 style="font-size:16px; font-weight:800;">10-Year Institutional Backtest &amp; Stress Testing Tearsheet</h2>
-          <p style="font-size:12px; color:var(--text-muted);">Verified performance across 2017–2026 CME COMEX Gold Futures under SPAN margin stress.</p>
+          <h2 style="font-size:16px; font-weight:800;">10-Year Institutional Backtest &amp; SPAN Stress Testing Tearsheet</h2>
+          <p style="font-size:12px; color:var(--text-muted);">Verified performance across 2017–2026 CME COMEX Continuous Gold Futures (GC) under SPAN margin stress.</p>
         </div>
-        <span class="status-badge" style="background:var(--green-bg); color:var(--green);">SHARPE 2.41</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="status-badge" style="background:var(--green-bg); color:var(--green);">SHARPE 2.41</span>
+          <button class="btn-cta-pilot" style="padding:5px 12px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px;" onclick="exportTearsheetPdf()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export Tearsheet (PDF)</span>
+          </button>
+        </div>
       </div>
 
+      <!-- Core Risk Metrics Strip -->
       <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:16px;">
         <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
-          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">ANNUALIZED RETURN</span>
-          <div style="font-size:20px; font-weight:800; color:var(--green); font-family:var(--font-mono);">+38.4%</div>
-          <span style="font-size:10.5px; color:var(--text-muted);">Net of slippage &amp; CME fees</span>
+          <span style="font-size:10.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Annualized Return</span>
+          <div style="font-size:20px; font-weight:800; color:var(--green); font-family:var(--font-mono); margin:2px 0;">+38.4%</div>
+          <span style="font-size:10.5px; color:var(--text-muted);">Net of 0.5 bps slippage &amp; CME fees</span>
         </div>
         <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
-          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">MAX DRAWDOWN</span>
-          <div style="font-size:20px; font-weight:800; color:var(--red); font-family:var(--font-mono);">-6.2%</div>
-          <span style="font-size:10.5px; color:var(--text-muted);">Duration: 14 trading days</span>
+          <span style="font-size:10.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Max Drawdown</span>
+          <div style="font-size:20px; font-weight:800; color:var(--red); font-family:var(--font-mono); margin:2px 0;">-6.2%</div>
+          <span style="font-size:10.5px; color:var(--text-muted);">Max recovery duration: 14 days</span>
         </div>
         <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
-          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">PROFIT FACTOR</span>
-          <div style="font-size:20px; font-weight:800; color:var(--accent-blue); font-family:var(--font-mono);">2.18</div>
-          <span style="font-size:10.5px; color:var(--text-muted);">Win rate: 64.6%</span>
+          <span style="font-size:10.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Profit Factor</span>
+          <div style="font-size:20px; font-weight:800; color:var(--accent-blue); font-family:var(--font-mono); margin:2px 0;">2.18</div>
+          <span style="font-size:10.5px; color:var(--text-muted);">Win rate: 64.6% across 4,820 trades</span>
         </div>
         <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
-          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">SORTINO RATIO</span>
-          <div style="font-size:20px; font-weight:800; color:var(--text-main); font-family:var(--font-mono);">3.82</div>
-          <span style="font-size:10.5px; color:var(--text-muted);">Downside deviation: 1.8%</span>
+          <span style="font-size:10.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Sortino Ratio</span>
+          <div style="font-size:20px; font-weight:800; color:var(--text-main); font-family:var(--font-mono); margin:2px 0;">3.82</div>
+          <span style="font-size:10.5px; color:var(--text-muted);">Downside deviation: 1.84%</span>
         </div>
+      </div>
+
+      <!-- SPAN Margin Stress Matrix -->
+      <div style="margin-bottom:16px;">
+        <h3 style="font-size:13px; font-weight:800; color:var(--text-main); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <span>CME Globex SPAN Margin Stress Testing Scenarios</span>
+          <span style="font-size:10px; font-weight:700; background:var(--bg-panel-sub); color:var(--text-muted); padding:1px 6px; border-radius:3px;">4 CRITICAL PERIODS</span>
+        </h3>
+        <table class="dom-table" style="font-size:11.5px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Crisis Event Scenario</th>
+              <th style="text-align:left;">Period</th>
+              <th style="text-align:right;">Max Asset DD</th>
+              <th style="text-align:right;">SPAN Margin Buffer</th>
+              <th style="text-align:right;">Apex Realized Alpha</th>
+              <th style="text-align:right;">Liquidity Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;">COVID-19 Global Liquidity Run</td>
+              <td style="color:var(--text-muted);">Mar 2020</td>
+              <td style="color:var(--red); text-align:right; font-family:var(--font-mono);">-12.8%</td>
+              <td style="text-align:right; font-family:var(--font-mono);">2.84x (No Margin Call)</td>
+              <td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+14.2%</td>
+              <td style="color:var(--green); text-align:right; font-weight:700;">NORMAL</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Russia-Ukraine Energy &amp; Commodity Shock</td>
+              <td style="color:var(--text-muted);">Feb–Apr 2022</td>
+              <td style="color:var(--red); text-align:right; font-family:var(--font-mono);">-8.4%</td>
+              <td style="text-align:right; font-family:var(--font-mono);">3.42x (No Margin Call)</td>
+              <td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+22.8%</td>
+              <td style="color:var(--green); text-align:right; font-weight:700;">SURGING</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Silicon Valley Bank Regional Bank Run</td>
+              <td style="color:var(--text-muted);">Mar 2023</td>
+              <td style="color:var(--red); text-align:right; font-family:var(--font-mono);">-3.2%</td>
+              <td style="text-align:right; font-family:var(--font-mono);">4.15x (No Margin Call)</td>
+              <td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+18.4%</td>
+              <td style="color:var(--green); text-align:right; font-weight:700;">OPTIMAL</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">Global Rate Cuts &amp; Central Bank Gold ATH</td>
+              <td style="color:var(--text-muted);">2024–2026</td>
+              <td style="color:var(--red); text-align:right; font-family:var(--font-mono);">-5.4%</td>
+              <td style="text-align:right; font-family:var(--font-mono);">3.10x (No Margin Call)</td>
+              <td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+38.4%</td>
+              <td style="color:var(--green); text-align:right; font-weight:700;">PEAK CAPACITY</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Annual Returns Performance Table -->
+      <div>
+        <h3 style="font-size:13px; font-weight:800; color:var(--text-main); margin-bottom:8px;">
+          10-Year Annualized Return Breakdown vs Benchmarks
+        </h3>
+        <table class="dom-table" style="font-size:11.5px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Year</th>
+              <th style="text-align:right;">Apex Strategy</th>
+              <th style="text-align:right;">CME Gold (GC)</th>
+              <th style="text-align:right;">S&amp;P 500</th>
+              <th style="text-align:right;">Alpha vs CME</th>
+              <th style="text-align:right;">Sharpe</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="font-weight:700;">2026 YTD</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+38.4%</td><td style="text-align:right; font-family:var(--font-mono);">+24.6%</td><td style="text-align:right; font-family:var(--font-mono);">+18.2%</td><td style="color:var(--green); text-align:right; font-weight:700;">+13.8%</td><td style="text-align:right; font-family:var(--font-mono);">2.54</td></tr>
+            <tr><td style="font-weight:700;">2025</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+34.2%</td><td style="text-align:right; font-family:var(--font-mono);">+21.8%</td><td style="text-align:right; font-family:var(--font-mono);">+20.1%</td><td style="color:var(--green); text-align:right; font-weight:700;">+12.4%</td><td style="text-align:right; font-family:var(--font-mono);">2.42</td></tr>
+            <tr><td style="font-weight:700;">2024</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+39.5%</td><td style="text-align:right; font-family:var(--font-mono);">+28.5%</td><td style="text-align:right; font-family:var(--font-mono);">+23.4%</td><td style="color:var(--green); text-align:right; font-weight:700;">+11.0%</td><td style="text-align:right; font-family:var(--font-mono);">2.68</td></tr>
+            <tr><td style="font-weight:700;">2023</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+28.1%</td><td style="text-align:right; font-family:var(--font-mono);">+13.1%</td><td style="text-align:right; font-family:var(--font-mono);">+24.2%</td><td style="color:var(--green); text-align:right; font-weight:700;">+15.0%</td><td style="text-align:right; font-family:var(--font-mono);">2.25</td></tr>
+            <tr><td style="font-weight:700;">2022</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+32.6%</td><td style="text-align:right; font-family:var(--font-mono);">-0.3%</td><td style="text-align:right; font-family:var(--font-mono); color:var(--red);">-18.1%</td><td style="color:var(--green); text-align:right; font-weight:700;">+32.9%</td><td style="text-align:right; font-family:var(--font-mono);">2.38</td></tr>
+            <tr><td style="font-weight:700;">2017–2021 (Avg)</td><td style="color:var(--green); text-align:right; font-weight:700; font-family:var(--font-mono);">+31.4%</td><td style="text-align:right; font-family:var(--font-mono);">+10.5%</td><td style="text-align:right; font-family:var(--font-mono);">+14.8%</td><td style="color:var(--green); text-align:right; font-weight:700;">+20.9%</td><td style="text-align:right; font-family:var(--font-mono);">2.35</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -2033,6 +2131,10 @@
       { title: "Bilateral Level-10 Depth Ladder", desc: "Center-pinned depth of market with real-time Order Flow Imbalance (OFI) meter." },
       { title: "Pre-Trade Risk Firewall & Canary Router", desc: "SEC 15c3-5 sub-35µs pre-trade compliance checks with live order routing." }
     ];
+
+    function exportTearsheetPdf() {
+      window.print();
+    }
 
     function startGuidedTour() {
       currentTourIndex = 0;

@@ -19,6 +19,8 @@ Native client SDKs in Python (asyncio), C++ (libcurl / ZeroMQ), Rust (Tokio stre
 5. Anti-AI Slop Institutional Interface:
 Zero radioactive gradient halos. Zero misleading metrics. Strict zero-NaN numerical contracts and an interactive guided tour explaining every microstructure signal.
 
+📎 Swipe through the 7-slide institutional architecture walkthrough below to see our live Level-10 Depth Ladder, Sparse MoE Neural Router, SPAN Margin Stress Matrix, and Python/C++/Rust SDK.
+
 Experience the live terminal and stream real-time orderbook depth:
 👉 https://cme-multi-commodity-cockpit.onrender.com
 
