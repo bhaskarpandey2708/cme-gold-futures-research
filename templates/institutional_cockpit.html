@@ -11,24 +11,26 @@
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     :root {
-      --bg: #07090e;
-      --panel: #0d121c;
-      --panel-sub: #121927;
-      --card-border: #1a2335;
-      --card-border-hover: #2a3b59;
+      --bg: #090a0f;
+      --bg-surface: #0d0f16;
+      --panel: #11141e;
+      --panel-sub: #161b28;
+      --panel-hover: #1c2233;
+      --card-border: rgba(255, 255, 255, 0.07);
+      --card-border-hover: rgba(255, 255, 255, 0.14);
+      --card-border-active: rgba(14, 165, 233, 0.45);
       --accent-cyan: #06b6d4;
-      --accent-sky: #0ea5e9;
+      --accent-sky: #38bdf8;
       --accent-gold: #fbbf24;
-      --accent-gold-glow: rgba(251, 191, 36, 0.35);
       --green: #10b981;
-      --green-glow: rgba(16, 185, 129, 0.25);
+      --green-glow: rgba(16, 185, 129, 0.15);
       --red: #f43f5e;
-      --red-glow: rgba(244, 63, 94, 0.25);
+      --red-glow: rgba(244, 63, 94, 0.15);
       --text: #f8fafc;
-      --text-muted: #8492a6;
-      --text-dim: #526075;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
       --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: "JetBrains Mono", monospace;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -41,21 +43,29 @@
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Apex Institutional Header */
+    /* Tabular figures for numbers */
+    .kpi-num, .px, .chg, #live-clock, .dom-table td, .dom-table th, .tabular-nums {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "cv01" 1, "cv02" 1;
+    }
+
+    /* Top Apex Institutional Header (Databento/Linear Caliber) */
     .portal-header {
-      background: #090d14;
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--card-border);
-      padding: 10px 20px;
+      padding: 10px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
       position: sticky;
       top: 0;
       z-index: 50;
+      backdrop-filter: blur(12px);
     }
     .brand-section {
       display: flex;
@@ -63,28 +73,28 @@
       gap: 12px;
     }
     .db-logo {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
-      border-radius: 7px;
+      width: 26px;
+      height: 26px;
+      background: #0ea5e9;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      color: #040810;
-      font-size: 14px;
-      box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+      font-weight: 700;
+      color: #030712;
+      font-size: 13px;
     }
     .brand-name {
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
       color: #fff;
     }
     .brand-sub {
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--text-dim);
       font-family: var(--font-mono);
+      letter-spacing: 0.02em;
     }
 
     /* Header Badges & Actions */
@@ -98,25 +108,25 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
       padding: 4px 9px;
-      border-radius: 6px;
+      border-radius: 5px;
       font-size: 11px;
       font-family: var(--font-mono);
       color: var(--text-muted);
     }
     .db-badge.live {
-      border-color: rgba(16, 185, 129, 0.4);
+      border-color: rgba(16, 185, 129, 0.3);
       color: var(--green);
-      background: rgba(16, 185, 129, 0.08);
+      background: rgba(16, 185, 129, 0.06);
     }
     .pulse-live {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 8px var(--green);
+      box-shadow: 0 0 6px var(--green);
       animation: pulse 1.6s infinite;
     }
     @keyframes pulse {
@@ -128,10 +138,10 @@
       background: #0284c7;
       color: #ffffff;
       font-weight: 600;
-      padding: 7px 15px;
-      border-radius: 6px;
+      padding: 6px 14px;
+      border-radius: 5px;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      font-size: 12px;
+      font-size: 11.5px;
       cursor: pointer;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
       transition: all 0.15s ease;
@@ -144,27 +154,27 @@
       border-color: rgba(255, 255, 255, 0.25);
     }
     .btn-subtle {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
       color: #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 11.5px;
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
     }
     .btn-subtle:hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.08);
       color: #fff;
-      border-color: var(--accent-sky);
+      border-color: rgba(255, 255, 255, 0.18);
     }
 
     /* Sub-Navigation & Apex Schema Ribbon */
     .controls-bar {
-      background: #0b0f17;
+      background: #0a0d14;
       border-bottom: 1px solid var(--card-border);
-      padding: 8px 20px;
+      padding: 8px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -175,28 +185,28 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-family: var(--font-mono);
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
-    .schema-spec-item b { color: #fff; }
+    .schema-spec-item b { color: #cbd5e1; font-weight: 600; }
 
-    /* Navigation Tabs */
+    /* Navigation Tabs (Linear/Databento Segmented Control) */
     .nav-tabs {
       display: flex;
-      gap: 4px;
-      background: #080b11;
+      gap: 2px;
+      background: rgba(255, 255, 255, 0.03);
       padding: 3px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
     }
     .nav-tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 11.5px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
@@ -206,54 +216,53 @@
     }
     .nav-tab-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
     .nav-tab-btn.active {
-      background: var(--panel);
-      color: var(--accent-cyan);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(6, 182, 212, 0.3);
+      background: #1e2638;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.25);
     }
 
-    /* Multi-Commodity Asset Selector Bar */
+    /* Multi-Commodity Asset Ribbon */
     .ticker-bar {
-      padding: 8px 20px;
+      padding: 6px 24px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
-      background: var(--panel);
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--card-border);
       scrollbar-width: thin;
       align-items: center;
     }
     .ticker-pill {
-      background: var(--panel-sub);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
       padding: 4px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-family: var(--font-mono);
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.15s;
     }
     .ticker-pill:hover {
-      border-color: var(--accent-sky);
-      background: rgba(14, 165, 233, 0.1);
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.05);
     }
     .ticker-pill.active {
-      border-color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.15);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+      border-color: var(--accent-sky);
+      background: rgba(14, 165, 233, 0.08);
+      border-bottom: 2px solid var(--accent-sky);
     }
     .ticker-pill .sym { font-weight: 700; color: #fff; }
     .ticker-pill .px { color: var(--text); }
-    .ticker-pill .chg.up { color: var(--green); }
-    .ticker-pill .chg.down { color: var(--red); }
+    .ticker-pill .chg.up { color: var(--green); font-size: 10px; }
+    .ticker-pill .chg.down { color: var(--red); font-size: 10px; }
 
     /* Main Content Layout */
     .main-container {
-      padding: 16px 20px;
+      padding: 16px 24px;
       flex: 1;
     }
     .tab-content { display: none; }
@@ -269,7 +278,7 @@
     .kpi-card {
       background: var(--panel);
       border: 1px solid var(--card-border);
-      border-radius: 9px;
+      border-radius: 6px;
       padding: 14px 16px;
       transition: border-color 0.2s;
     }
@@ -278,16 +287,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 10.5px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
       margin-bottom: 6px;
     }
     .kpi-num {
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 21px;
+      font-weight: 600;
       font-family: var(--font-mono);
+      letter-spacing: -0.02em;
     }
     .kpi-sub {
       font-size: 11px;
@@ -308,7 +318,7 @@
     .chart-panel {
       background: var(--panel);
       border: 1px solid var(--card-border);
-      border-radius: 9px;
+      border-radius: 6px;
       padding: 14px;
       display: flex;
       flex-direction: column;
@@ -345,13 +355,20 @@
       height: 420px;
       border-radius: 6px;
       overflow: hidden;
+      position: relative;
+    }
+    #tv-attr-logo, #apex-microstructure-chart a[id*="tv-attr"], #apex-microstructure-chart a {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
 
     /* Depth of Market (Level-10 DOM Ladder) */
     .dom-panel {
       background: var(--panel);
       border: 1px solid var(--card-border);
-      border-radius: 9px;
+      border-radius: 6px;
       padding: 14px;
       display: flex;
       flex-direction: column;
@@ -418,7 +435,7 @@
     .sub-card {
       background: var(--panel);
       border: 1px solid var(--card-border);
-      border-radius: 9px;
+      border-radius: 6px;
       padding: 16px;
     }
     .sub-title {
@@ -748,28 +765,28 @@
   <!-- Top Apex Institutional Header -->
   <header class="portal-header">
     <div class="brand-section">
-      <div class="db-logo" style="background:linear-gradient(135deg, #06b6d4, #0284c7); color:#000; font-weight:900;">▲</div>
+      <div class="db-logo">▲</div>
       <div>
-        <div class="brand-name">APEX QUANTITATIVE | CME MULTI-COMMODITY TERMINAL</div>
-        <div class="brand-sub">Protocol: <b>CME Globex MDP 3.0</b> · Continuous Microstructure · Sub-35µs Gate</div>
+        <div class="brand-name">APEX QUANTITATIVE</div>
+        <div class="brand-sub">CME GLOBEX MDP 3.0 · CONTINUOUS MICROSTRUCTURE</div>
+      </div>
+      <div class="db-badge live" style="margin-left: 8px;">
+        <span class="pulse-live"></span>
+        <span>FEED ACTIVE (18µs)</span>
       </div>
     </div>
     <div class="header-pills">
-      <div class="db-badge live"><span class="pulse-live"></span>LIVE STREAM</div>
-      <div class="db-badge" title="CME Aurora Illinois co-location round-trip latency">⚡ COLO: <b>34.2 µs</b></div>
-      <div class="db-badge" title="Sparse Mixture of Experts neural decision latency across 5 quantitative models">ROUTER: <b>0.19 ms MoE</b></div>
-      <div class="db-badge" style="color:var(--accent-gold);">ARCHITECT: <b>Bhaskar Pandey</b></div>
-      <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20connecting%20from%20Apex%20CME%20Cockpit" target="_blank" class="btn-whatsapp-header" title="Direct WhatsApp connection to Bhaskar Pandey (+91 9470778244)">
-        <span>💬</span> WA: +91 9470778244
-      </a>
-      <button class="btn-subtle" onclick="startGuidedTour()" style="border-color:var(--accent-cyan); color:var(--accent-cyan); font-weight:700;">💡 Platform Tour</button>
-      <button class="btn-subtle" onclick="openAccessLogModal()" title="View live login audit and prospective allocator leads" style="border-color:rgba(16,185,129,0.3); color:#34d399; font-weight:600;">👥 Access Log</button>
       <div class="db-badge" id="live-clock">--:--:-- UTC</div>
+      <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20connecting%20from%20Apex%20CME%20Cockpit" target="_blank" class="btn-subtle" title="Direct WhatsApp connection to Bhaskar Pandey (+91 9470778244)" style="color:#34d399; text-decoration:none;">
+        <span>💬</span> Desk: +91 9470778244
+      </a>
+      <button class="btn-subtle" onclick="startGuidedTour()" style="border-color:rgba(56, 189, 248, 0.3); color:#38bdf8;">Tour</button>
+      <button class="btn-subtle" onclick="openAccessLogModal()" title="View live login audit and prospective allocator leads" style="border-color:rgba(16,185,129,0.3); color:#34d399;">Access Log</button>
+      <button class="btn-subtle" onclick="openMemoModal()">Pre-Market Memo</button>
       <div id="user-session-badge" style="display:none; align-items:center; gap:6px;">
         <span class="db-badge" style="color:var(--green);"><span style="color:var(--green);">●</span> <span id="user-display-email">trader@fund.com</span></span>
-        <button class="btn-subtle" onclick="logoutSession()" style="padding:3px 7px; font-size:10.5px;">Switch</button>
+        <button class="btn-subtle" onclick="logoutSession()" style="padding:2px 6px; font-size:10px;">Switch</button>
       </div>
-      <button class="btn-subtle" onclick="openMemoModal()">Pre-Market Memo</button>
       <button class="btn-gold" onclick="openLeadModal()">Request Allocator Pilot</button>
     </div>
   </header>
@@ -783,16 +800,16 @@
       <span style="color:var(--text-dim);">|</span>
       <span class="schema-spec-item">Encoding: <b>dbn / parquet</b></span>
       <span style="color:var(--text-dim);">|</span>
-      <span class="schema-spec-item">Compression: <b>zstd (level 3)</b></span>
+      <span class="schema-spec-item">Venue: <b>Aurora DC3 (18µs)</b></span>
     </div>
 
     <!-- 5 Top-Level Portal Tabs -->
     <div class="nav-tabs">
-      <button class="nav-tab-btn active" onclick="switchTab('tab-trading')">📈 Live Trading & L10 DOM</button>
-      <button class="nav-tab-btn" onclick="switchTab('tab-schemas')">🗄️ Schema Explorer & Lake</button>
-      <button class="nav-tab-btn" onclick="switchTab('tab-moe')">🧠 Sparse MoE Engine</button>
-      <button class="nav-tab-btn" onclick="switchTab('tab-blotter')">🏛️ Allocator Track Record</button>
-      <button class="nav-tab-btn" onclick="switchTab('tab-sdk')">Apex Client SDK</button>
+      <button class="nav-tab-btn active" onclick="switchTab('tab-trading')">1. Live Terminal &amp; L10 DOM</button>
+      <button class="nav-tab-btn" onclick="switchTab('tab-schemas')">2. Schemas &amp; Lakehouse</button>
+      <button class="nav-tab-btn" onclick="switchTab('tab-moe')">3. Sparse MoE Engine</button>
+      <button class="nav-tab-btn" onclick="switchTab('tab-blotter')">4. 10Y Institutional Tearsheet</button>
+      <button class="nav-tab-btn" onclick="switchTab('tab-sdk')">5. Developer SDK</button>
     </div>
   </div>
 
@@ -924,6 +941,20 @@
             <div class="dom-title" id="dom-title">Apex Level-10 Order Book Depth (MBP-10)</div>
             <span class="db-badge" style="font-size:10px;">10-LEVEL QUEUE</span>
           </div>
+
+          <!-- Order Flow Imbalance Gauge (Institutional Microstructure) -->
+          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:4px; padding:6px 10px; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); margin-bottom:4px;">
+              <span style="color:var(--green); font-weight:600;" id="dom-ofi-bid-txt">BID 58% (184 lots)</span>
+              <span style="color:var(--text-dim); font-size:9px; letter-spacing:0.04em;">ORDER FLOW IMBALANCE</span>
+              <span style="color:var(--red); font-weight:600;" id="dom-ofi-ask-txt">42% ASK (133 lots)</span>
+            </div>
+            <div style="display:flex; height:4px; border-radius:2px; overflow:hidden; background:rgba(255,255,255,0.05);">
+              <div id="dom-ofi-bid-bar" style="width:58%; background:var(--green); transition:width 0.25s ease;"></div>
+              <div id="dom-ofi-ask-bar" style="width:42%; background:var(--red); transition:width 0.25s ease;"></div>
+            </div>
+          </div>
+
           <table class="dom-table">
             <thead>
               <tr>
@@ -1725,9 +1756,24 @@ asyncio.run(main())
       }
       tbody.innerHTML = html;
 
-      document.getElementById('dom-total-bid').innerText = d.total_bid_depth || 340;
-      document.getElementById('dom-total-ask').innerText = d.total_ask_depth || 385;
-      const imb = d.book_imbalance !== undefined ? (d.book_imbalance * 100).toFixed(1) + '%' : '+24.0%';
+      const totalBid = d.total_bid_depth || (d.bids ? d.bids.reduce((acc, x) => acc + (x.size || 0), 0) : 340);
+      const totalAsk = d.total_ask_depth || (d.asks ? d.asks.reduce((acc, x) => acc + (x.size || 0), 0) : 385);
+      const totalDepth = totalBid + totalAsk;
+      const bidPct = totalDepth > 0 ? Math.round((totalBid / totalDepth) * 100) : 50;
+      const askPct = 100 - bidPct;
+
+      const ofiBidTxt = document.getElementById('dom-ofi-bid-txt');
+      const ofiAskTxt = document.getElementById('dom-ofi-ask-txt');
+      const ofiBidBar = document.getElementById('dom-ofi-bid-bar');
+      const ofiAskBar = document.getElementById('dom-ofi-ask-bar');
+      if (ofiBidTxt) ofiBidTxt.innerText = `BID ${bidPct}% (${totalBid} lots)`;
+      if (ofiAskTxt) ofiAskTxt.innerText = `${askPct}% ASK (${totalAsk} lots)`;
+      if (ofiBidBar) ofiBidBar.style.width = `${bidPct}%`;
+      if (ofiAskBar) ofiAskBar.style.width = `${askPct}%`;
+
+      document.getElementById('dom-total-bid').innerText = totalBid;
+      document.getElementById('dom-total-ask').innerText = totalAsk;
+      const imb = d.book_imbalance !== undefined ? (d.book_imbalance * 100).toFixed(1) + '%' : `${bidPct >= askPct ? '+' : '-'}${Math.abs(bidPct - askPct).toFixed(1)}%`;
       document.getElementById('dom-imbalance-pct').innerText = imb;
       if (d.spread) {
         document.getElementById('kpi-spread').innerText = `$${d.spread} (${d.spread_bps || '0.25'} bps)`;
