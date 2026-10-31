@@ -1449,6 +1449,28 @@ asyncio.run(main())
   </div>
 
   <!-- ========================================================================= -->
+  <!-- MODAL 3: PRE-MARKET INTELLIGENCE MEMO VIEWER                              -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" id="memoModalBackdrop">
+    <div class="modal-card" style="max-width:850px; max-height:92vh;">
+      <button class="modal-close" onclick="closeMemoModal()">&times;</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--card-border); padding-bottom:10px;">
+        <div>
+          <span class="db-badge" style="color:var(--accent-gold);">DAILY INTELLIGENCE DOSSIER</span>
+          <h2 style="font-size:17px; font-weight:800; color:#fff; margin-top:4px;">CME Globex Multi-Commodity Pre-Market Memo</h2>
+        </div>
+        <a href="/api/v1/memo?format=html" target="_blank" class="btn-subtle" style="text-decoration:none;">↗ Open Full Tab</a>
+      </div>
+      <div id="memoContent" style="background:#06090f; border:1px solid var(--card-border); border-radius:8px; padding:20px; max-height:65vh; overflow-y:auto; font-size:13px; line-height:1.6; color:#cbd5e1;">
+        Loading live pre-market intelligence memo...
+      </div>
+      <div style="margin-top:14px; text-align:right;">
+        <button class="btn-subtle" onclick="closeMemoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
   <!-- MODAL 4: INSTITUTIONAL ACCESS & VISITOR AUDIT BLOTTER                       -->
   <!-- ========================================================================= -->
   <div class="modal-backdrop" id="accessLogModalBackdrop">
