@@ -340,7 +340,7 @@
       border-color: var(--accent-sky);
       color: var(--accent-sky);
     }
-    #tv-chart-container {
+    #apex-microstructure-chart {
       width: 100%;
       height: 420px;
       border-radius: 6px;
@@ -903,17 +903,19 @@
         <div class="chart-panel">
           <div class="chart-toolbar">
             <div style="display:flex; align-items:center; gap:10px;">
-              <b style="font-size:13px;" id="chart-symbol-heading">GC.FUT · Continuous Gold Futures (1H)</b>
+              <b style="font-size:13px;" id="chart-symbol-heading">GC.FUT · Continuous Gold Futures (1S)</b>
+              <span class="db-badge" style="color:var(--green);"><span style="color:var(--green);">●</span> LIVE 1-SEC FEED</span>
               <span class="db-badge">GLBX.MDP3</span>
             </div>
             <div class="tf-selector">
+              <button class="tf-btn active" onclick="changeTimeframe('1s')">1S</button>
               <button class="tf-btn" onclick="changeTimeframe('1m')">1M</button>
               <button class="tf-btn" onclick="changeTimeframe('5m')">5M</button>
-              <button class="tf-btn active" onclick="changeTimeframe('1h')">1H</button>
+              <button class="tf-btn" onclick="changeTimeframe('1h')">1H</button>
               <button class="tf-btn" onclick="changeTimeframe('1d')">1D</button>
             </div>
           </div>
-          <div id="tv-chart-container"></div>
+          <div id="apex-microstructure-chart"></div>
         </div>
 
         <!-- Right: Apex Level-10 Depth of Market Ladder (MBP-10) -->
@@ -1585,13 +1587,16 @@ asyncio.run(main())
       document.getElementById('chart-symbol-heading').innerText = `${sym}.FUT · Continuous Futures (1H)`;
       document.getElementById('dom-title').innerText = `${sym}.FUT MBP-10 Order Book Depth (L10)`;
 
-      loadChartData(sym);
+      loadChartData(sym, currentTf);
       loadDepth10(sym);
     }
 
+    let currentTf = '1s';
+    let lastCandle = null;
+
     // Initialize Apex Canvas Microstructure Chart Engine
     function initChart() {
-      const container = document.getElementById('tv-chart-container');
+      const container = document.getElementById('apex-microstructure-chart');
       chart = LightweightCharts.createChart(container, {
         layout: {
           background: { color: '#090d15' },
@@ -1605,7 +1610,7 @@ asyncio.run(main())
         timeScale: {
           borderColor: '#1a2335',
           timeVisible: true,
-          secondsVisible: false,
+          secondsVisible: true,
         },
         rightPriceScale: {
           borderColor: '#1a2335',
@@ -1638,26 +1643,45 @@ asyncio.run(main())
         chart.applyOptions({ width: container.clientWidth });
       });
 
-      loadChartData(activeSymbol);
+      loadChartData(activeSymbol, currentTf);
     }
 
-    function loadChartData(sym) {
-      fetch(`/api/v1/ohlcv?symbol=${sym}&limit=120`)
+    function changeTimeframe(tf) {
+      currentTf = tf;
+      document.querySelectorAll('.tf-selector .tf-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.toLowerCase() === tf.toLowerCase());
+      });
+      const symLabel = ASSET_CONFIG[activeSymbol]?.name || activeSymbol;
+      document.getElementById('chart-symbol-heading').innerText = `${activeSymbol}.FUT · ${symLabel} (${tf.toUpperCase()})`;
+      
+      chart.applyOptions({
+        timeScale: {
+          secondsVisible: (tf === '1s')
+        }
+      });
+
+      loadChartData(activeSymbol, tf);
+    }
+
+    function loadChartData(sym, tf = currentTf) {
+      fetch(`/api/v1/ohlcv?symbol=${sym}&tf=${tf}&limit=120`)
         .then(r => r.json())
         .then(res => {
           if (res.bars && res.bars.length > 0) {
             candleSeries.setData(res.bars);
+            lastCandle = res.bars[res.bars.length - 1];
             const vols = res.bars.map(b => ({
               time: b.time,
-              value: b.volume || 1500,
+              value: b.volume || 15,
               color: b.close >= b.open ? 'rgba(16, 185, 129, 0.25)' : 'rgba(244, 63, 94, 0.25)'
             }));
             volumeSeries.setData(vols);
             chart.timeScale().fitContent();
 
             // Update top active price
-            const lastBar = res.bars[res.bars.length - 1];
-            document.getElementById('active-price-val').innerText = (lastBar.close < 10 ? '$' : '$') + Number(lastBar.close).toFixed(lastBar.close < 10 ? 3 : 2);
+            if (lastCandle) {
+              document.getElementById('active-price-val').innerText = (lastCandle.close < 10 ? '$' : '$') + Number(lastCandle.close).toFixed(lastCandle.close < 10 ? 3 : 2);
+            }
           }
         })
         .catch(e => console.error('OHLCV load error', e));
@@ -1773,6 +1797,28 @@ asyncio.run(main())
       `;
       tape.insertBefore(row, tape.firstChild);
       if (tape.children.length > 5) tape.removeChild(tape.lastChild);
+
+      // Real-time 1-Second Microstructure Candle Streaming
+      if (candleSeries && lastCandle && currentTf === '1s' && sym === activeSymbol) {
+        const curSec = Math.floor(Date.now() / 1000);
+        if (curSec > lastCandle.time) {
+          lastCandle = {
+            time: curSec,
+            open: px,
+            high: px,
+            low: px,
+            close: px,
+            volume: sz
+          };
+          try { candleSeries.update(lastCandle); } catch(e){}
+        } else {
+          lastCandle.high = Math.max(lastCandle.high, px);
+          lastCandle.low = Math.min(lastCandle.low, px);
+          lastCandle.close = px;
+          lastCandle.volume += sz;
+          try { candleSeries.update(lastCandle); } catch(e){}
+        }
+      }
     }
 
     // Canary Order Router
@@ -2265,9 +2311,9 @@ curl -s -X POST "https://cme-multi-commodity-cockpit.onrender.com/api/v1/cockpit
         body: 'Switch in real time across 11 CME Globex commodities (Gold GC, Silver SI, Copper HG, Platinum PL, Crude Oil CL, Brent BZ, Natural Gas NG, Corn ZC, Wheat ZW, Soybeans ZS, and NIFTY). Charts, L10 DOM, and order routing update instantly.'
       },
       {
-        target: '#tv-chart-container',
-        title: '2. High-Frequency Microstructure Chart',
-        body: 'Apex Canvas engine rendering real-time OHLCV candlestick bars and volume histograms across 1M, 5M, 1H, and 1D timeframes. Clean, zero-lag, and directly linked to CME Globex MDP 3.0 ticks.'
+        target: '#apex-microstructure-chart',
+        title: '2. High-Frequency Microstructure Chart (1S Resolution)',
+        body: 'Apex native Canvas engine rendering real-time OHLCV candlestick bars across 1S (1-Second), 1M, 5M, 1H, and 1D timeframes. Clean, zero-lag, and directly linked to CME Globex MDP 3.0 ticks.'
       },
       {
         target: '.dom-panel',
