@@ -212,7 +212,7 @@ def run_walkthrough():
         page.wait_for_timeout(2500)
         page.screenshot(path=str(LOCAL_SCREENS_DIR / "08_premarket_memo_modal_view.png"), full_page=False)
         print("   ✅ Captured: 08_premarket_memo_modal_view.png")
-        page.evaluate("closeMemoModal()")
+        page.evaluate("try { if (typeof closeMemoModal === 'function') closeMemoModal(); } catch(e){}")
         page.wait_for_timeout(800)
 
         # Step 12: Open Feedback Drawer Modal
@@ -226,16 +226,16 @@ def run_walkthrough():
         page.wait_for_timeout(1000)
         page.screenshot(path=str(LOCAL_SCREENS_DIR / "09_feedback_modal_view.png"), full_page=False)
         print("   ✅ Captured: 09_feedback_modal_view.png")
-        page.evaluate("closeFeedbackModal()")
+        page.evaluate("try { if (typeof closeFeedbackModal === 'function') closeFeedbackModal(); } catch(e){}")
         page.wait_for_timeout(800)
 
         # Step 12b: Open Access Log & Visitor Audit Blotter Modal
         print("▶ Step 12b: Opening Institutional Access & Login Audit Blotter...")
-        page.evaluate("openAccessLogModal()")
+        page.evaluate("try { if (typeof openAccessLogModal === 'function') openAccessLogModal(); } catch(e){}")
         page.wait_for_timeout(2000)
         page.screenshot(path=str(LOCAL_SCREENS_DIR / "12_access_log_audit_view.png"), full_page=False)
         print("   ✅ Captured: 12_access_log_audit_view.png")
-        page.evaluate("closeAccessLogModal()")
+        page.evaluate("try { if (typeof closeAccessLogModal === 'function') closeAccessLogModal(); } catch(e){}")
         page.wait_for_timeout(800)
 
         # Step 13: OpenAPI Swagger Documentation View
