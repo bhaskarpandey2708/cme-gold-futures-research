@@ -7,10 +7,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Zero-flash Early Theme Detection -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('apex_theme_mode') || 'system';
+      let theme = saved;
+      if (saved === 'system') {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        theme = prefersDark ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <!-- Apex High-Frequency Institutional Microstructure Canvas Engine -->
   <script src="https://unpkg.com/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     :root {
+      /* Dark Institutional Theme (Default) */
       --bg: #090a0f;
       --bg-surface: #0d0f16;
       --panel: #11141e;
@@ -29,8 +42,80 @@
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
+      --brand-title: #ffffff;
+      --input-bg: #090d14;
+      --input-border: rgba(255, 255, 255, 0.12);
+      --code-bg: #06080d;
+      --code-text: #94a3b8;
+      --table-header-bg: rgba(255, 255, 255, 0.02);
+      --badge-bg: rgba(255, 255, 255, 0.03);
+      --badge-border: rgba(255, 255, 255, 0.07);
+      --btn-subtle-bg: rgba(255, 255, 255, 0.04);
+      --btn-subtle-text: #cbd5e1;
+      --btn-subtle-hover-bg: rgba(255, 255, 255, 0.08);
+      --ticker-pill-bg: rgba(255, 255, 255, 0.02);
+      --ticker-pill-border: rgba(255, 255, 255, 0.07);
+      --ticker-pill-active-bg: rgba(14, 165, 233, 0.08);
+      --ticker-pill-active-border: #38bdf8;
+      --nav-tabs-bg: rgba(255, 255, 255, 0.03);
+      --nav-tab-active-bg: #1e2638;
+      --nav-tab-active-text: #38bdf8;
+      --nav-tab-active-border: rgba(56, 189, 248, 0.25);
+      --modal-card-bg: #0d111a;
+      --modal-backdrop-bg: rgba(4, 7, 12, 0.88);
+      --modal-border: rgba(255, 255, 255, 0.1);
+      --auth-card-bg: #0b0f17;
+      --ofi-box-bg: rgba(255, 255, 255, 0.02);
+      --ofi-track-bg: rgba(255, 255, 255, 0.05);
       --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      /* Databento/Linear Institutional Clean Light Theme */
+      --bg: #f8fafc;
+      --bg-surface: #ffffff;
+      --panel: #ffffff;
+      --panel-sub: #f1f5f9;
+      --panel-hover: #f8fafc;
+      --card-border: #e2e8f0;
+      --card-border-hover: #cbd5e1;
+      --card-border-active: #0284c7;
+      --accent-cyan: #0284c7;
+      --accent-sky: #0284c7;
+      --accent-gold: #b45309;
+      --green: #059669;
+      --green-glow: rgba(5, 150, 105, 0.12);
+      --red: #e11d48;
+      --red-glow: rgba(225, 29, 72, 0.12);
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --brand-title: #0f172a;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+      --table-header-bg: #f8fafc;
+      --badge-bg: #f1f5f9;
+      --badge-border: #e2e8f0;
+      --btn-subtle-bg: #f1f5f9;
+      --btn-subtle-text: #1e293b;
+      --btn-subtle-hover-bg: #e2e8f0;
+      --ticker-pill-bg: #ffffff;
+      --ticker-pill-border: #e2e8f0;
+      --ticker-pill-active-bg: #f0f9ff;
+      --ticker-pill-active-border: #0284c7;
+      --nav-tabs-bg: #f1f5f9;
+      --nav-tab-active-bg: #ffffff;
+      --nav-tab-active-text: #0284c7;
+      --nav-tab-active-border: #cbd5e1;
+      --modal-card-bg: #ffffff;
+      --modal-backdrop-bg: rgba(15, 23, 42, 0.55);
+      --modal-border: #e2e8f0;
+      --auth-card-bg: #ffffff;
+      --ofi-box-bg: #f8fafc;
+      --ofi-track-bg: #e2e8f0;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -88,13 +173,53 @@
       font-size: 14.5px;
       font-weight: 700;
       letter-spacing: -0.015em;
-      color: #fff;
+      color: var(--brand-title);
     }
     .brand-sub {
       font-size: 11px;
       color: var(--text-dim);
       font-family: var(--font-mono);
       letter-spacing: 0.02em;
+    }
+
+    /* Segmented Theme Switcher */
+    .theme-toggle-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--btn-subtle-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .theme-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .theme-btn:hover {
+      color: var(--text);
+    }
+    .theme-btn.active {
+      background: var(--panel-hover);
+      color: var(--accent-sky);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    [data-theme="light"] .theme-btn.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     /* Header Badges & Actions */
@@ -108,8 +233,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
       padding: 4px 9px;
       border-radius: 5px;
       font-size: 11px;
@@ -154,9 +279,9 @@
       border-color: rgba(255, 255, 255, 0.25);
     }
     .btn-subtle {
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--btn-subtle-bg);
       border: 1px solid var(--card-border);
-      color: #cbd5e1;
+      color: var(--btn-subtle-text);
       padding: 5px 11px;
       border-radius: 5px;
       font-size: 11px;
@@ -165,14 +290,14 @@
       transition: all 0.15s;
     }
     .btn-subtle:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.18);
+      background: var(--btn-subtle-hover-bg);
+      color: var(--brand-title);
+      border-color: var(--card-border-hover);
     }
 
     /* Sub-Navigation & Apex Schema Ribbon */
     .controls-bar {
-      background: #0a0d14;
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--card-border);
       padding: 8px 24px;
       display: flex;
@@ -189,13 +314,13 @@
       font-family: var(--font-mono);
       color: var(--text-dim);
     }
-    .schema-spec-item b { color: #cbd5e1; font-weight: 600; }
+    .schema-spec-item b { color: var(--brand-title); font-weight: 600; }
 
     /* Navigation Tabs (Linear/Databento Segmented Control) */
     .nav-tabs {
       display: flex;
       gap: 2px;
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--nav-tabs-bg);
       padding: 3px;
       border-radius: 6px;
       border: 1px solid var(--card-border);
@@ -214,11 +339,12 @@
       gap: 6px;
       transition: all 0.15s;
     }
-    .nav-tab-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+    .nav-tab-btn:hover { color: var(--brand-title); background: var(--btn-subtle-hover-bg); }
     .nav-tab-btn.active {
-      background: #1e2638;
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: var(--nav-tab-active-bg);
+      color: var(--nav-tab-active-text);
+      border: 1px solid var(--nav-tab-active-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     /* Multi-Commodity Asset Ribbon */
@@ -233,8 +359,8 @@
       align-items: center;
     }
     .ticker-pill {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--card-border);
+      background: var(--ticker-pill-bg);
+      border: 1px solid var(--ticker-pill-border);
       border-radius: 4px;
       padding: 4px 10px;
       display: flex;
@@ -247,15 +373,15 @@
       transition: all 0.15s;
     }
     .ticker-pill:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--card-border-hover);
+      background: var(--panel-hover);
     }
     .ticker-pill.active {
-      border-color: var(--accent-sky);
-      background: rgba(14, 165, 233, 0.08);
-      border-bottom: 2px solid var(--accent-sky);
+      border-color: var(--ticker-pill-active-border);
+      background: var(--ticker-pill-active-bg);
+      border-bottom: 2px solid var(--ticker-pill-active-border);
     }
-    .ticker-pill .sym { font-weight: 700; color: #fff; }
+    .ticker-pill .sym { font-weight: 700; color: var(--brand-title); }
     .ticker-pill .px { color: var(--text); }
     .ticker-pill .chg.up { color: var(--green); font-size: 10px; }
     .ticker-pill .chg.down { color: var(--red); font-size: 10px; }
@@ -281,6 +407,7 @@
       border-radius: 6px;
       padding: 14px 16px;
       transition: border-color 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
     .kpi-card:hover { border-color: var(--card-border-hover); }
     .kpi-header {
@@ -322,6 +449,7 @@
       padding: 14px;
       display: flex;
       flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
     .chart-toolbar {
       display: flex;
@@ -372,6 +500,7 @@
       padding: 14px;
       display: flex;
       flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
     .dom-header {
       display: flex;
@@ -382,7 +511,7 @@
     .dom-title {
       font-size: 12px;
       font-weight: 700;
-      color: #fff;
+      color: var(--brand-title);
     }
     .dom-table {
       width: 100%;
@@ -437,6 +566,7 @@
       border: 1px solid var(--card-border);
       border-radius: 6px;
       padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     }
     .sub-title {
       font-size: 12px;
@@ -452,9 +582,9 @@
 
     /* Forms, Inputs, Buttons */
     input, select, textarea {
-      background: #090d14;
-      border: 1px solid var(--card-border);
-      color: #fff;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text);
       padding: 7px 11px;
       border-radius: 5px;
       font-family: var(--font-sans);
@@ -464,8 +594,8 @@
       width: 100%;
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.25);
+      border-color: var(--accent-sky);
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
     }
     button.btn-action {
       background: var(--accent-cyan);
@@ -484,25 +614,25 @@
 
     /* Code Generator & Terminal Boxes */
     .code-box {
-      background: #06080d;
+      background: var(--code-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
       padding: 12px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #94a3b8;
+      color: var(--code-text);
       overflow-x: auto;
       line-height: 1.6;
     }
     .code-box .kw { color: #38bdf8; }
     .code-box .str { color: #34d399; }
-    .code-box .comm { color: #475569; }
+    .code-box .comm { color: #64748b; }
 
     /* Modals */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(4, 7, 12, 0.88);
+      background: var(--modal-backdrop-bg);
       backdrop-filter: blur(8px);
       z-index: 1000;
       display: none;
@@ -512,9 +642,9 @@
     }
     .modal-backdrop.open { display: flex; }
     .modal-card {
-      background: var(--panel);
-      border: 1px solid rgba(14, 165, 233, 0.35);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(14, 165, 233, 0.15);
+      background: var(--modal-card-bg);
+      border: 1px solid var(--modal-border);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
       border-radius: 12px;
       width: 100%;
       max-width: 600px;
@@ -522,6 +652,7 @@
       overflow-y: auto;
       padding: 24px;
       position: relative;
+      color: var(--text);
     }
     .modal-close {
       position: absolute;
@@ -532,7 +663,7 @@
       font-size: 20px;
       cursor: pointer;
     }
-    .modal-close:hover { color: #fff; }
+    .modal-close:hover { color: var(--brand-title); }
     .form-row { margin-bottom: 12px; }
     .form-row label {
       display: block;
@@ -777,7 +908,24 @@
     </div>
     <div class="header-pills">
       <div class="db-badge" id="live-clock">--:--:-- UTC</div>
-      <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20connecting%20from%20Apex%20CME%20Cockpit" target="_blank" class="btn-subtle" title="Direct WhatsApp connection to Bhaskar Pandey (+91 9470778244)" style="color:#34d399; text-decoration:none;">
+
+      <!-- Segmented Theme Switcher: Light / Dark / Auto -->
+      <div class="theme-toggle-group" id="themeToggleGroup">
+        <button class="theme-btn" id="theme-btn-light" onclick="setTheme('light')" title="Light Theme (Databento Finesse)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span>Light</span>
+        </button>
+        <button class="theme-btn" id="theme-btn-dark" onclick="setTheme('dark')" title="Dark Theme (Carbon Slate)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span>Dark</span>
+        </button>
+        <button class="theme-btn active" id="theme-btn-system" onclick="setTheme('system')" title="Auto (Follow System OS)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span>Auto</span>
+        </button>
+      </div>
+
+      <a href="https://wa.me/919470778244?text=Hi%20Bhaskar,%20connecting%20from%20Apex%20CME%20Cockpit" target="_blank" class="btn-subtle" title="Direct WhatsApp connection to Bhaskar Pandey (+91 9470778244)" style="color:#10b981; text-decoration:none;">
         <span>💬</span> Desk: +91 9470778244
       </a>
       <button class="btn-subtle" onclick="startGuidedTour()" style="border-color:rgba(56, 189, 248, 0.3); color:#38bdf8;">Tour</button>
@@ -943,13 +1091,13 @@
           </div>
 
           <!-- Order Flow Imbalance Gauge (Institutional Microstructure) -->
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:4px; padding:6px 10px; margin-bottom:8px;">
+          <div style="background:var(--ofi-box-bg); border:1px solid var(--card-border); border-radius:4px; padding:6px 10px; margin-bottom:8px;">
             <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); margin-bottom:4px;">
               <span style="color:var(--green); font-weight:600;" id="dom-ofi-bid-txt">BID 58% (184 lots)</span>
               <span style="color:var(--text-dim); font-size:9px; letter-spacing:0.04em;">ORDER FLOW IMBALANCE</span>
               <span style="color:var(--red); font-weight:600;" id="dom-ofi-ask-txt">42% ASK (133 lots)</span>
             </div>
-            <div style="display:flex; height:4px; border-radius:2px; overflow:hidden; background:rgba(255,255,255,0.05);">
+            <div style="display:flex; height:4px; border-radius:2px; overflow:hidden; background:var(--ofi-track-bg);">
               <div id="dom-ofi-bid-bar" style="width:58%; background:var(--green); transition:width 0.25s ease;"></div>
               <div id="dom-ofi-ask-bar" style="width:42%; background:var(--red); transition:width 0.25s ease;"></div>
             </div>
@@ -1241,7 +1389,7 @@ asyncio.run(main())
       <span class="db-badge" style="color:var(--accent-cyan);" id="tourStepBadge">STEP 1 OF 6</span>
       <button class="modal-close" style="position:static; font-size:18px;" onclick="skipTour()">&times;</button>
     </div>
-    <h3 style="font-size:15px; font-weight:800; color:#fff; margin-bottom:8px;" id="tourTitle">Multi-Commodity Ribbon</h3>
+    <h3 style="font-size:15px; font-weight:800; color:var(--brand-title); margin-bottom:8px;" id="tourTitle">Multi-Commodity Ribbon</h3>
     <p style="font-size:12.5px; color:var(--text-muted); line-height:1.6; margin-bottom:18px;" id="tourBody">
       Explore real-time data across 11 CME Globex commodity futures with 1 click.
     </p>
@@ -1276,7 +1424,7 @@ asyncio.run(main())
           <span style="color:var(--accent-cyan); font-weight:900; font-size:11px;">▲</span>
           <span style="font-size:10px; font-weight:700; color:var(--accent-cyan); letter-spacing:0.08em; text-transform:uppercase;">Institutional Access Gateway</span>
         </div>
-        <h2 style="font-size:21px; font-weight:700; color:#fff; letter-spacing:-0.02em;">Apex Multi-Commodity Terminal</h2>
+        <h2 style="font-size:21px; font-weight:700; color:var(--brand-title); letter-spacing:-0.02em;">Apex Multi-Commodity Terminal</h2>
         <p style="font-size:12.5px; color:var(--text-muted); margin-top:6px; line-height:1.5;">
           Institutional access verification. Enter your work email below to receive an authentication OTP and access CME Globex MDP 3.0 microstructure feeds.
         </p>
@@ -1364,7 +1512,7 @@ asyncio.run(main())
       <button class="modal-close" onclick="closeLeadModal()">&times;</button>
       <div style="margin-bottom:16px;">
         <span class="db-badge" style="color:var(--accent-gold); margin-bottom:6px;">INSTITUTIONAL ALLOCATION INTAKE</span>
-        <h2 style="font-size:19px; font-weight:800; color:#fff;">Request Pilot Allocation &amp; Strategy Tearsheet</h2>
+        <h2 style="font-size:19px; font-weight:800; color:var(--brand-title);">Request Pilot Allocation &amp; Strategy Tearsheet</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">
           Receive our audited 10-year walk-forward tearsheet, daily pre-market commodity dossier, and programmatic API credentials.
         </p>
@@ -1439,7 +1587,7 @@ asyncio.run(main())
       <button class="modal-close" onclick="closeFeedbackModal()">&times;</button>
       <div style="margin-bottom:14px;">
         <span class="db-badge" style="color:var(--accent-cyan); margin-bottom:6px;">INVESTOR &amp; COMMUNITY FEEDBACK</span>
-        <h2 style="font-size:18px; font-weight:800; color:#fff;">Share Your Thoughts &amp; Advice</h2>
+        <h2 style="font-size:18px; font-weight:800; color:var(--brand-title);">Share Your Thoughts &amp; Advice</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">
           Visited from LinkedIn or testing our multi-commodity platform? We value your thoughts, questions, and feature requests.
         </p>
@@ -1490,11 +1638,11 @@ asyncio.run(main())
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--card-border); padding-bottom:10px;">
         <div>
           <span class="db-badge" style="color:var(--accent-gold);">DAILY INTELLIGENCE DOSSIER</span>
-          <h2 style="font-size:17px; font-weight:800; color:#fff; margin-top:4px;">CME Globex Multi-Commodity Pre-Market Memo</h2>
+          <h2 style="font-size:17px; font-weight:800; color:var(--brand-title); margin-top:4px;">CME Globex Multi-Commodity Pre-Market Memo</h2>
         </div>
         <a href="/api/v1/memo?format=html" target="_blank" class="btn-subtle" style="text-decoration:none;">↗ Open Full Tab</a>
       </div>
-      <div id="memoContent" style="background:#06090f; border:1px solid var(--card-border); border-radius:8px; padding:20px; max-height:65vh; overflow-y:auto; font-size:13px; line-height:1.6; color:#cbd5e1;">
+      <div id="memoContent" style="background:var(--code-bg); border:1px solid var(--card-border); border-radius:8px; padding:20px; max-height:65vh; overflow-y:auto; font-size:13px; line-height:1.6; color:var(--text);">
         Loading live pre-market intelligence memo...
       </div>
       <div style="margin-top:14px; text-align:right;">
@@ -1515,7 +1663,7 @@ asyncio.run(main())
             <span style="color:#10b981; font-size:10px;">●</span>
             <span style="font-size:10px; font-weight:700; color:#10b981; letter-spacing:0.06em; text-transform:uppercase;">Live Visitor & Login Audit Ledger</span>
           </div>
-          <h2 style="font-size:18px; font-weight:700; color:#fff; margin-top:2px;">Institutional Access Telemetry</h2>
+          <h2 style="font-size:18px; font-weight:700; color:var(--brand-title); margin-top:2px;">Institutional Access Telemetry</h2>
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn-subtle" onclick="loadAccessLogData()" style="padding:6px 12px; font-size:11.5px;">🔄 Refresh Stream</button>
@@ -1625,26 +1773,89 @@ asyncio.run(main())
     let currentTf = '1s';
     let lastCandle = null;
 
+    // =========================================================================
+    // SYSTEM / LIGHT / DARK THEME MANAGER (DATABENTO-GRADE FIDELITY)
+    // =========================================================================
+    let currentThemeMode = localStorage.getItem('apex_theme_mode') || 'system';
+
+    function initTheme() {
+      // Listen to OS theme changes if in system mode
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (currentThemeMode === 'system') {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+      setTheme(currentThemeMode, false);
+    }
+
+    function setTheme(mode, save = true) {
+      currentThemeMode = mode;
+      if (save) {
+        localStorage.setItem('apex_theme_mode', mode);
+      }
+      
+      // Update toggle buttons active class
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`theme-btn-${mode}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      let resolvedTheme = mode;
+      if (mode === 'system') {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        resolvedTheme = prefersDark ? 'dark' : 'light';
+      }
+      applyTheme(resolvedTheme);
+    }
+
+    function applyTheme(resolvedTheme) {
+      document.documentElement.setAttribute('data-theme', resolvedTheme);
+      document.body.setAttribute('data-theme', resolvedTheme);
+      
+      const isDark = resolvedTheme === 'dark';
+      
+      if (chart) {
+        chart.applyOptions({
+          layout: {
+            background: { color: isDark ? '#090a0f' : '#ffffff' },
+            textColor: isDark ? '#8492a6' : '#64748b',
+          },
+          grid: {
+            vertLines: { color: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.04)' },
+            horzLines: { color: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.04)' },
+          },
+          timeScale: {
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+          },
+          rightPriceScale: {
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+          }
+        });
+      }
+    }
+
     // Initialize Apex Canvas Microstructure Chart Engine
     function initChart() {
       const container = document.getElementById('apex-microstructure-chart');
+      const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
       chart = LightweightCharts.createChart(container, {
         layout: {
-          background: { color: '#090d15' },
-          textColor: '#8492a6',
+          background: { color: isDark ? '#090a0f' : '#ffffff' },
+          textColor: isDark ? '#8492a6' : '#64748b',
           fontFamily: 'JetBrains Mono, monospace',
         },
         grid: {
-          vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
-          horzLines: { color: 'rgba(255, 255, 255, 0.03)' },
+          vertLines: { color: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.04)' },
+          horzLines: { color: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.04)' },
         },
         timeScale: {
-          borderColor: '#1a2335',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
           timeVisible: true,
           secondsVisible: true,
         },
         rightPriceScale: {
-          borderColor: '#1a2335',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
         },
         crosshair: {
           vertLine: { color: '#0ea5e9', width: 1, style: 2 },
@@ -2007,7 +2218,7 @@ asyncio.run(main())
           tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
           tr.innerHTML = `
             <td style="padding:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim);">${(l.created_at || '').substring(0, 19).replace('T', ' ')}</td>
-            <td style="padding:10px; font-weight:600; color:#fff;">${l.name || 'Trader'}</td>
+            <td style="padding:10px; font-weight:600; color:var(--brand-title);">${l.name || 'Trader'}</td>
             <td style="padding:10px;"><a href="mailto:${l.email}" style="color:var(--accent-cyan); text-decoration:none;">${l.email}</a></td>
             <td style="padding:10px; font-size:12px; color:var(--text-muted);">${l.role || 'Institutional Desk'}</td>
             <td style="padding:10px;">
@@ -2039,7 +2250,7 @@ asyncio.run(main())
           tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
           tr.innerHTML = `
             <td style="padding:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-dim);">${(ld.created_at || '').substring(0, 19).replace('T', ' ')}</td>
-            <td style="padding:10px; font-weight:600; color:#fff;">${ld.name} <span style="font-size:11px; color:var(--text-dim);">(${ld.organization || 'Prop'})</span></td>
+            <td style="padding:10px; font-weight:600; color:var(--brand-title);">${ld.name} <span style="font-size:11px; color:var(--text-dim);">(${ld.organization || 'Prop'})</span></td>
             <td style="padding:10px;"><a href="mailto:${ld.email}" style="color:var(--accent-cyan); text-decoration:none;">${ld.email}</a></td>
             <td style="padding:10px; font-size:12px; color:var(--accent-gold);">${ld.interest_type || 'SMA Mandate'}</td>
             <td style="padding:10px; font-size:12px;">${ld.capital_capacity || ld.role || 'Institutional'}</td>
@@ -2461,6 +2672,7 @@ curl -s -X POST "https://cme-multi-commodity-cockpit.onrender.com/api/v1/cockpit
 
     // Startup
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       checkAuthSession();
       initChart();
       loadDepth10('GC');
