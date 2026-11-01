@@ -1398,6 +1398,131 @@
           </tbody>
         </table>
       </div>
+      <!-- ========================================================================= -->
+      <!-- INTERACTIVE ALLOCATOR CAPITAL & SPAN MARGIN SIMULATOR                     -->
+      <!-- ========================================================================= -->
+      <div style="background:#ffffff; border:1px solid var(--border); border-radius:8px; padding:18px; margin-top:18px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:10px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:5px; background:var(--accent-blue-bg); border-radius:4px; padding:2px 8px; margin-bottom:4px;">
+              <span style="color:var(--accent-blue); font-weight:800; font-size:10px;">PRO-FORMA</span>
+              <span style="font-size:10px; font-weight:700; color:var(--accent-blue); text-transform:uppercase; letter-spacing:0.05em;">Interactive Allocator Mandate Simulator</span>
+            </div>
+            <h3 style="font-size:15px; font-weight:800; color:var(--text-main);">Capital Allocation, SPAN Margin Buffers &amp; Net Alpha Schedule</h3>
+            <p style="font-size:11.5px; color:var(--text-muted);">Model custom institutional SMA sizes, high-water mark net returns, and unencumbered T-bill yield overlays.</p>
+          </div>
+          <div style="text-align:right;">
+            <span class="status-badge" style="background:var(--amber-bg); color:var(--amber);">0% MGMT / 20% INCENTIVE (HWM)</span>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 38% 62%; gap:18px;">
+          <!-- Left: Controls -->
+          <div style="background:var(--bg-panel-sub); padding:16px; border-radius:8px; border:1px solid var(--border); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+                <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Target SMA Mandate (AUM)</label>
+                <span id="sim-aum-readout" style="font-size:22px; font-weight:800; color:var(--accent-blue); font-family:var(--font-mono);">$25,000,000</span>
+              </div>
+
+              <!-- Slider -->
+              <input type="range" id="sim-aum-slider" min="5" max="100" step="5" value="25" oninput="updateMandateSim(this.value)" style="width:100%; height:6px; border-radius:3px; accent-color:var(--accent-blue); cursor:pointer; margin-bottom:12px;">
+
+              <!-- Presets -->
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+                <button type="button" class="action-icon-btn" style="padding:3px 8px; font-size:10.5px;" onclick="setMandateAum(5)">$5M (Canary)</button>
+                <button type="button" class="action-icon-btn" style="padding:3px 8px; font-size:10.5px;" onclick="setMandateAum(10)">$10M (Standard)</button>
+                <button type="button" class="action-icon-btn active" style="padding:3px 8px; font-size:10.5px; background:var(--accent-blue-bg); color:var(--accent-blue); border-color:var(--accent-blue);" onclick="setMandateAum(25)" id="preset-btn-25">$25M (Multi-Asset)</button>
+                <button type="button" class="action-icon-btn" style="padding:3px 8px; font-size:10.5px;" onclick="setMandateAum(50)">$50M (Prime)</button>
+                <button type="button" class="action-icon-btn" style="padding:3px 8px; font-size:10.5px;" onclick="setMandateAum(100)">$100M (Cap)</button>
+              </div>
+
+              <!-- Clearing FCM -->
+              <div class="form-group" style="margin-bottom:12px;">
+                <label style="font-size:10.5px; font-weight:700; color:var(--text-muted);">Custody &amp; Clearing FCM</label>
+                <select id="sim-fcm" style="padding:6px 10px; font-size:11.5px;">
+                  <option value="GSEC">Goldman Sachs Execution &amp; Clearing (GSEC)</option>
+                  <option value="IBKR" selected>Interactive Brokers LLC (Direct FIX :9800)</option>
+                  <option value="STONEX">StoneX Financial / Marex Prime</option>
+                  <option value="JPM">J.P. Morgan Clearing Corp</option>
+                </select>
+              </div>
+
+              <div style="font-size:11px; color:var(--text-muted); line-height:1.4; background:#ffffff; padding:8px 10px; border-radius:6px; border:1px solid var(--border);">
+                <b>Segregated Clearing:</b> All capital remains in allocator's direct legal SMA account with CME clearing member. Apex operates strictly via trading authority (LPOA).
+              </div>
+            </div>
+
+            <!-- Lock-in CTA -->
+            <button class="btn-cta-pilot" style="width:100%; padding:10px; font-size:12px; margin-top:16px; justify-content:center; display:flex; align-items:center; gap:6px;" onclick="lockInMandateSlot()">
+              <span>Lock In <span id="cta-aum-btn">$25M</span> Pilot Allocation Slot</span> &rarr;
+            </button>
+          </div>
+
+          <!-- Right: Pro-Forma Schedule Grid -->
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+              <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
+                <div style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Gross Annual Strategy Alpha (38.4%)</div>
+                <div id="sim-gross-alpha" style="font-size:18px; font-weight:800; color:var(--green); font-family:var(--font-mono); margin:2px 0;">+$9,600,000</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Audited 10Y backtest outperformance</div>
+              </div>
+
+              <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
+                <div style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Net Alpha to Investor (30.72%)</div>
+                <div id="sim-net-alpha" style="font-size:18px; font-weight:800; color:var(--green); font-family:var(--font-mono); margin:2px 0;">+$7,680,000</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Net of 20% performance fee (HWM)</div>
+              </div>
+
+              <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
+                <div style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Unencumbered T-Bill Yield (4.8%)</div>
+                <div id="sim-tbill-yield" style="font-size:18px; font-weight:800; color:var(--accent-blue); font-family:var(--font-mono); margin:2px 0;">+$936,000</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Yield on unallocated cash balance</div>
+              </div>
+
+              <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border); border-left:3px solid var(--green);">
+                <div style="font-size:10.5px; font-weight:700; color:var(--green); text-transform:uppercase;">Total Blended Net Return (34.46%)</div>
+                <div id="sim-blended-net" style="font-size:18px; font-weight:800; color:var(--green); font-family:var(--font-mono); margin:2px 0;">+$8,616,000</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Alpha + risk-free Treasury yield</div>
+              </div>
+            </div>
+
+            <!-- Detailed SPAN Margin & Risk Schedule Table -->
+            <table class="dom-table" style="font-size:11.5px;">
+              <thead>
+                <tr>
+                  <th style="text-align:left;">Institutional Risk &amp; Capital Schedule Metric</th>
+                  <th style="text-align:right;">Ratio</th>
+                  <th style="text-align:right;">Pro-Forma Amount ($)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700;">Initial CME SPAN Margin Committed</td>
+                  <td style="text-align:right; color:var(--text-muted);">22.0%</td>
+                  <td id="sim-span-margin" style="text-align:right; font-weight:700; font-family:var(--font-mono);">$5,500,000</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;">Unencumbered Cash Reserves (Zero Margin Call Buffer)</td>
+                  <td style="text-align:right; color:var(--green); font-weight:700;">78.0%</td>
+                  <td id="sim-unencumbered-cash" style="text-align:right; font-weight:700; font-family:var(--font-mono); color:var(--green);">$19,500,000</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;">Maximum Historical Drawdown Dollar Exposure</td>
+                  <td style="text-align:right; color:var(--red); font-weight:700;">-6.2%</td>
+                  <td id="sim-max-dd-dollars" style="text-align:right; font-weight:700; font-family:var(--font-mono); color:var(--red);">-$1,550,000</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700;">Annual Incentive Fee Accrual (High-Water Mark Protected)</td>
+                  <td style="text-align:right; color:var(--accent-blue);">20.0%</td>
+                  <td id="sim-perf-fee" style="text-align:right; font-weight:700; font-family:var(--font-mono); color:var(--accent-blue);">$1,920,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- TAB 5: DEVELOPER SDK -->
@@ -2131,6 +2256,78 @@
       { title: "Bilateral Level-10 Depth Ladder", desc: "Center-pinned depth of market with real-time Order Flow Imbalance (OFI) meter." },
       { title: "Pre-Trade Risk Firewall & Canary Router", desc: "SEC 15c3-5 sub-35µs pre-trade compliance checks with live order routing." }
     ];
+
+
+    // Allocator Mandate Simulator
+    let currentSimAum = 25;
+
+    function formatUsd(val) {
+      return '$' + Math.round(val).toLocaleString('en-US');
+    }
+
+    function setMandateAum(aumMillions) {
+      document.getElementById('sim-aum-slider').value = aumMillions;
+      updateMandateSim(aumMillions);
+    }
+
+    function updateMandateSim(aumMillions) {
+      currentSimAum = parseFloat(aumMillions);
+      const aum = currentSimAum * 1000000;
+      
+      const grossAlpha = aum * 0.384;
+      const perfFee = grossAlpha * 0.20;
+      const netAlpha = grossAlpha - perfFee;
+      const spanMargin = aum * 0.22;
+      const unencumberedCash = aum - spanMargin;
+      const tbillYield = unencumberedCash * 0.048;
+      const blendedNet = netAlpha + tbillYield;
+      const maxDdDollars = aum * 0.062;
+
+      document.getElementById('sim-aum-readout').innerText = formatUsd(aum);
+      document.getElementById('cta-aum-btn').innerText = '$' + currentSimAum + 'M';
+      
+      document.getElementById('sim-gross-alpha').innerText = '+' + formatUsd(grossAlpha);
+      document.getElementById('sim-net-alpha').innerText = '+' + formatUsd(netAlpha);
+      document.getElementById('sim-tbill-yield').innerText = '+' + formatUsd(tbillYield);
+      document.getElementById('sim-blended-net').innerText = '+' + formatUsd(blendedNet);
+      
+      document.getElementById('sim-span-margin').innerText = formatUsd(spanMargin);
+      document.getElementById('sim-unencumbered-cash').innerText = formatUsd(unencumberedCash);
+      document.getElementById('sim-max-dd-dollars').innerText = '-' + formatUsd(maxDdDollars);
+      document.getElementById('sim-perf-fee').innerText = formatUsd(perfFee);
+
+      // Highlight active preset button
+      document.querySelectorAll('.action-icon-btn').forEach(btn => {
+        if (btn.innerText.includes('$' + currentSimAum + 'M')) {
+          btn.style.background = 'var(--accent-blue-bg)';
+          btn.style.color = 'var(--accent-blue)';
+          btn.style.borderColor = 'var(--accent-blue)';
+        } else if (btn.innerText.includes('Canary') || btn.innerText.includes('Standard') || btn.innerText.includes('Multi-Asset') || btn.innerText.includes('Prime') || btn.innerText.includes('Cap')) {
+          btn.style.background = '#ffffff';
+          btn.style.color = 'var(--text-muted)';
+          btn.style.borderColor = 'var(--border)';
+        }
+      });
+    }
+
+    function lockInMandateSlot() {
+      openLeadModal();
+      const aumSelect = document.getElementById('lead-aum');
+      if (aumSelect) {
+        if (currentSimAum <= 10) {
+          aumSelect.value = '5M_10M';
+        } else if (currentSimAum <= 25) {
+          aumSelect.value = '10M_25M';
+        } else {
+          aumSelect.value = '25M_100M';
+        }
+      }
+      const firmInput = document.getElementById('lead-firm');
+      const fcmSelect = document.getElementById('sim-fcm');
+      if (firmInput && fcmSelect) {
+        firmInput.placeholder = `Mandate: $${currentSimAum}M via ${fcmSelect.value}`;
+      }
+    }
 
     function exportTearsheetPdf() {
       window.print();
