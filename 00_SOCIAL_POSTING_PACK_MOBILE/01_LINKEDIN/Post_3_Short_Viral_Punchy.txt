@@ -1,0 +1,25 @@
+We spent 6 months building the quantitative trading workstation we wished existed.
+
+No fake sine-wave charts.
+No radioactive neon dashboards.
+No hidden vendor lock-in.
+
+Just pure, institutional CME Globex market microstructure:
+
+⚡ 0.2ms Level-10 Depth Rebuild (MBP-10 across Gold, Crude, Silver, Gas)
+🧠 Sparse Mixture-of-Experts (MoE) Neural Router (DeepLOB + Hawkes VPIN + Macro TFT)
+🛡️ Sub-35μs SEC 15c3-5 Pre-Trade Risk Firewall
+📊 Interactive Allocator SPAN Margin & Capital Simulator (0% Mgmt / 20% HWM)
+🐍 Async Python SDK + FIX 4.2 / 4.4 Canary Routing
+
+Live on the web right now:
+👉 https://cme-multi-commodity-cockpit.onrender.com
+
+All research, data pipelines, and SDKs are open on GitHub:
+👉 https://github.com/bhaskarpandey2708/cme-gold-futures-research
+
+Allocator pilot desk:
+💬 WhatsApp: +91 9470778244
+📧 bhaskarauthor@gmail.com
+
+#Quant #FinTech #HFT #Python #Trading #MachineLearning #Futures

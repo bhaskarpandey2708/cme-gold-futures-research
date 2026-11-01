@@ -1,0 +1,21 @@
+=============================================================================
+HOW TO POST THE 7-SLIDE PDF CAROUSEL ON LINKEDIN MOBILE APP
+=============================================================================
+
+1. Open the LinkedIn App on your iPhone or Android.
+2. Tap the '+' button at the bottom to create a new post.
+3. Tap the '...' (More) icon at the bottom of the composer.
+4. Select 'Add a document' (or 'Document' icon).
+5. Browse your files and select:
+   04_CAROUSEL_PDF_AND_SLIDES/Apex_CME_Globex_Institutional_Walkthrough.pdf
+6. In the Document Title field, enter:
+   "Apex CME Globex Institutional Architecture Walkthrough"
+7. In the post text area, paste the entire text from:
+   01_LINKEDIN/Post_1_Launch_Document_Carousel.txt
+8. Review and tap 'Post'!
+
+Why Document Posts Win on LinkedIn:
+• PDF Document posts generate 3x to 5x higher reach than standard link posts.
+• Allocators and quants love swiping through slide decks directly inside their mobile feed.
+• Every slide has high-resolution charts, system architectures, and contact links.
+=============================================================================

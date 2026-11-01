@@ -1,0 +1,58 @@
+SUBREDDIT: r/algotrading
+POST TYPE: Text Post (Self Post)
+FLAIR: [OC] or Project
+
+TITLE:
+[OC] Reconstructing CME Globex MBP-10 Orderbook Microstructure & Benchmarking DeepLOB with Hawkes VPIN (Free 10Y Gold Data Lake & Code)
+
+BODY:
+Hey r/algotrading,
+
+Over the past 6 months, our team worked on bridging the gap between raw nanosecond exchange packets (CME MDP 3.0 / Databento DBN) and multi-horizon machine learning alpha on CME COMEX Gold Futures (GC).
+
+Most public algo trading tutorials use daily or 1-minute OHLCV bars. But if you've traded live futures, you know that true alpha and queue dynamics live entirely inside the Level-2/Level-3 order book.
+
+We open-sourced our entire research codebase, pre-trade risk firewall, and live interactive cockpit:
+• Live Web Cockpit: https://cme-multi-commodity-cockpit.onrender.com
+• GitHub Repo: https://github.com/bhaskarpandey2708/cme-gold-futures-research
+• Free 7-Day Sample Lake (Excel + CSV): https://drive.google.com/open?id=1fr_uvzVDe4mQBzF7c1dpnqPCAGclC8SD
+
+Here is a technical teardown of what we engineered:
+
+1. Microstructure Feature Store:
+Instead of predicting next-tick prices directly, we extract 16 mathematical microstructure features from the Level-10 book:
+• Order Flow Imbalance (OFI & Delta-OFI): Multi-level queue volume changes tracking bid/ask depletion.
+• Hawkes Process VPIN: Modeling self-exciting point processes to quantify trade cluster toxicity and informed flow.
+• Micro-Price Drift: Volume-weighted mid-price adjusted for queue depth imbalance.
+• Marcos López de Prado Triple Barrier Labeling: Dynamic vertical and horizontal volatility barriers (+1, 0, -1) to prevent lookahead bias and path-dependent overfitting.
+
+2. DeepLOB & Neural Architecture:
+We benchmarked a Spatial Inception-CNN + BiLSTM architecture across out-of-sample test splits:
+• Receptive fields capture localized Level-10 queue imbalances across time.
+• Evaluated under realistic FIFO queue depletion and 0.5 bps exchange fees + slippage.
+
+3. Sparse Mixture-of-Experts (MoE) Routing:
+Rather than relying on a single model, an 8-expert neural routing gate dynamically weights models:
+• DeepLOB (Microstructure Imbalance)
+• Macro TFT (Cross-Asset Macro Regime: DXY, Treasury Yields, Crude)
+• Avellaneda-Stoikov (Inventory Management & Half-Spread Quoting)
+• Hawkes Toxicity Dampener (Scales down sizing during high-toxicity toxic flow)
+
+4. Sub-35μs SEC 15c3-5 Pre-Trade Risk Firewall:
+Before any canary test order touches the FIX router, it passes 5 hardware-conscious safety checks:
+• Fat-Finger contract clip checks (< 25 lots)
+• Maximum notional exposure ($5M)
+• High-frequency message throttle (< 500 msgs/sec)
+• Automatic kill-switch on circuit breakers
+
+5. Audited 10-Year Backtest & SPAN Stress Testing:
+Across 2017–2026 out-of-sample data under CME SPAN margin stress:
+• Annualized Return: +38.4%
+• Max Drawdown: -6.2%
+• Sharpe Ratio: 2.41 | Sortino Ratio: 3.82 | Profit Factor: 2.18
+• COVID-19 (Mar 2020): 2.84x SPAN buffer (Zero margin calls, +14.2% alpha)
+• Ukraine Shock (Feb 2022): 3.42x SPAN buffer (+22.8% alpha)
+• SVB Crisis (Mar 2023): 4.15x SPAN buffer (+18.4% alpha)
+
+Check out the live terminal and test the WebSocket/REST feeds.
+Would love feedback from other futures quants on how you handle Hawkes calibration under high-frequency tick spikes!

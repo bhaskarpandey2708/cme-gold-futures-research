@@ -1,0 +1,33 @@
+Deep Dive: How our Sparse Mixture-of-Experts (MoE) Neural Router trades CME Gold Futures (GC) microstructure in real time.
+
+Most ML trading models fail in live execution because they assume stationarity: they train a single monolithic model that works in low volatility and blows up during an orderbook liquidity shock.
+
+Here is how our architecture handles regime shifts:
+
+1. Microstructure Feature Store (Computed at Nanosecond Timestamps):
+• Order Flow Imbalance (OFI & Delta-OFI): Tracking multi-level queue depletion across L1–L10.
+• Hawkes Process VPIN: Modeling self-exciting tick clusters to measure instantaneous order toxicity.
+• Micro-Price Drift: Estimating volume-weighted fair value relative to prevailing mid.
+• Triple Barrier Labeling: Marcos López de Prado vertical and horizontal volatility barriers (+1, 0, -1).
+
+2. The 8-Expert Routing Gating Network:
+The router assigns dynamic softmax weights to specialized expert models based on the current market regime:
+• DeepLOB Expert (Spatial Inception-CNN + BiLSTM): Activates during localized queue imbalance.
+• Macro TFT Expert (Temporal Fusion Transformer): Activates on cross-asset macro correlation spikes (Treasury yields, DXY, Crude).
+• Avellaneda-Stoikov Market Maker: Manages inventory risk and half-spread quoting in balanced regimes.
+• Hawkes Toxicity Dampener: Scales down position sizing when aggressive informed toxic flow spikes.
+
+3. Sub-35μs Hardware Pre-Trade Risk Engine:
+Before any canary order hits the FIX gateway, it passes through 5 hardware-conscious pre-trade checks:
+• Fat-Finger contract clip checks (< 25 lots)
+• Maximum cumulative notional exposure ($5.0M)
+• Short-term message throttle (< 500 msgs/sec)
+• Automatic kill-switch on circuit breakers
+
+Test the live routing feed and stream the live orderbook:
+👉 https://cme-multi-commodity-cockpit.onrender.com
+
+Full codebase and architecture:
+👉 https://github.com/bhaskarpandey2708/cme-gold-futures-research
+
+Trading Desk WhatsApp: +91 9470778244

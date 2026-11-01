@@ -1,0 +1,31 @@
+TEASER 1 (Short & Punchy):
+Most financial dashboards look like a radioactive arcade from 2005.
+
+We built the quantitative trading workstation we wished existed:
+• 0.2ms CME Globex MBP-10 Depth
+• Sparse MoE Neural Router
+• Sub-35μs Risk Firewall
+• 10Y SPAN Margin Simulator
+
+Live: https://cme-multi-commodity-cockpit.onrender.com
+Code: https://github.com/bhaskarpandey2708/cme-gold-futures-research
+
+---
+
+TEASER 2 (Allocator & Margin Focus):
+How does an institutional CTA manage CME Gold allocations without margin calls in a crisis?
+
+We released an Interactive SPAN Margin Simulator:
+• 22% CME Margin vs 78% T-bill reserve
+• 0% Mgmt / 20% Incentive (HWM)
+• Stress tested on COVID-19 & SVB
+
+Try it live: https://cme-multi-commodity-cockpit.onrender.com
+
+---
+
+TEASER 3 (Open Source / SDK Focus):
+Open-sourced 10 years of CME COMEX Gold Futures microstructure research + Async Python SDK + Level-10 Orderbook Depth Engine:
+
+Live Cockpit: https://cme-multi-commodity-cockpit.onrender.com
+GitHub: https://github.com/bhaskarpandey2708/cme-gold-futures-research

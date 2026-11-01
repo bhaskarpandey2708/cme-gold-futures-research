@@ -1,0 +1,23 @@
+=============================================================================
+REDDIT POSTING RULES & ETIQUETTE FOR MAXIMUM ENGAGEMENT
+=============================================================================
+
+1. NEVER SOUND LIKE A SALESPERSON:
+   • Reddit communities (especially r/algotrading and r/quant) will instantly downvote and ban marketing fluff.
+   • Always speak as a researcher/engineer sharing open-source code and data.
+   • Frame everything around "Here is what we engineered, here is the math, here is the code, what do you think?"
+
+2. ENGAGE IN THE COMMENTS:
+   • When someone asks a technical question about Hawkes calibration or FIFO slippage, reply with deep, thoughtful technical details.
+   • Link to the specific file in GitHub or give a quick Python snippet in your reply.
+
+3. OPTIMAL POSTING TIME:
+   • Best times for r/algotrading and r/quant:
+     Tuesday through Thursday, between 8:00 AM – 10:00 AM US Eastern Time (5:30 PM – 7:30 PM IST).
+     This catches US finance professionals and tech quants as they start their morning.
+
+4. FLAIRS:
+   • In r/algotrading: Choose flair "[OC]" or "Project"
+   • In r/quant: Choose flair "Research" or "Discussion"
+   • In r/MachineLearning: Start title with "[P]"
+=============================================================================

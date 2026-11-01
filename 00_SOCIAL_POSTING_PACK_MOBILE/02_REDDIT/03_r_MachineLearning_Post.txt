@@ -1,0 +1,29 @@
+SUBREDDIT: r/MachineLearning
+POST TYPE: Text Post
+FLAIR: [P] Project
+
+TITLE:
+[P] Sparse Mixture-of-Experts (MoE) Architecture for High-Frequency Futures Microstructure Regime Gating (CME Globex)
+
+BODY:
+Hi everyone,
+
+We wanted to share our project applying Sparse Mixture-of-Experts (MoE) gating to high-frequency financial market microstructure (CME COMEX Gold Futures).
+
+Code & Architecture: https://github.com/bhaskarpandey2708/cme-gold-futures-research
+Live Interactive Interface: https://cme-multi-commodity-cockpit.onrender.com
+
+The Problem:
+Monolithic deep learning architectures (like vanilla LSTMs or Transformers) struggle with financial tick data due to rapid regime switching. A model trained for low-volatility spread capture performs poorly during high-volume liquidation spikes.
+
+Our Architecture:
+1. Gating Network:
+A lightweight softmax gating network that inspects rolling Garman-Klass volatility, Order Flow Imbalance (OFI), Hawkes process toxicity intensity, and cross-asset embedding vectors.
+2. Expert Sub-Networks:
+• Spatial Inception-CNN + BiLSTM (DeepLOB): Specializes in localized Level-10 book depth representation.
+• Temporal Fusion Transformer (TFT): Multi-horizon attention capturing macro correlations.
+• Stochastic Inventory Controller: Continuous Avellaneda-Stoikov parameterization for mean-reverting states.
+3. Training Pipeline:
+Trained on NVIDIA Tesla T4 GPUs via PyTorch with mixed-precision FP16, custom triple-barrier cross-entropy loss, and walk-forward purge-embargo validation.
+
+The full repository includes feature extraction scripts, model architectures, and an interactive web cockpit. Feedback and critique on our gating mechanics are very welcome!
