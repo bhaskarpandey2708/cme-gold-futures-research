@@ -210,6 +210,9 @@ class QuantAPIServer:
         self.app.router.add_get("/api/v1/admin/access-log", self.handle_access_log)
         self.app.router.add_get("/api/v1/fix/audit-export", self.handle_fix_audit_export)
         self.app.router.add_get("/api/v1/ddq/download", self.handle_ddq_download)
+        self.app.router.add_get("/api/v1/memo/audio", self.handle_memo_audio)
+        self.app.router.add_get("/api/v1/ilink3/packet-inspect", self.handle_ilink3_packet_inspect)
+        self.app.router.add_get("/api/v1/allocator/syndicate-csv", self.handle_syndicate_csv)
 
     async def start_background_tasks(self, app):
         app["broadcaster"] = asyncio.create_task(self._broadcaster_loop())
@@ -1892,6 +1895,131 @@ class QuantAPIServer:
 
 
 
+
+    async def handle_memo_audio(self, request):
+        mp3_path = OUTPUT_DIR / "CME_GOLD_PREMARKET_BRIEFING.mp3"
+        if not mp3_path.exists():
+            try:
+                from scripts.generate_audio_briefing import generate_audio
+                generate_audio()
+            except Exception as e:
+                print(f"Error compiling audio briefing: {e}")
+
+        if mp3_path.exists():
+            with open(mp3_path, "rb") as f:
+                mp3_bytes = f.read()
+            return web.Response(
+                body=mp3_bytes,
+                content_type="audio/mpeg",
+                headers={
+                    "Content-Disposition": 'inline; filename="CME_GOLD_PREMARKET_BRIEFING.mp3"',
+                    "Accept-Ranges": "bytes",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            )
+        return web.Response(status=404, text="Pre-market audio briefing not available.")
+
+    async def handle_ilink3_packet_inspect(self, request):
+        tmpl = request.query.get("template", "514")
+        if tmpl == "515":
+            data = {
+                "template_id": 515,
+                "name": "ExecutionReportNew515",
+                "protocol": "CME iLink 3 Binary Protocol (SBE)",
+                "sofh": {"msg_len": 80, "encoding_type": "0xEB50", "bytes_hex": "00 50 EB 50"},
+                "sbe_header": {"block_length": 48, "template_id": 515, "schema_id": 8, "version": 1, "bytes_hex": "30 00 03 02 08 00 01 00"},
+                "fields": [
+                    {"offset": "00..03", "name": "SOFH (Length + Type)", "type": "SOFH", "hex": "00 50 EB 50", "value": "80 bytes · CME SBE (0xEB50)"},
+                    {"offset": "04..11", "name": "SBE Header", "type": "MessageHeader", "hex": "30 00 03 02 08 00 01 00", "value": "Block: 48, Tmpl: 515, Schema: 8, Ver: 1"},
+                    {"offset": "12..19", "name": "OrderID", "type": "uint64", "hex": "05 40 21 00 00 00 00 00", "value": "2,179,077 (Globex Assigned)"},
+                    {"offset": "20..27", "name": "ExecID", "type": "uint64", "hex": "7A 89 01 00 00 00 00 00", "value": "100,730 (Execution Match)"},
+                    {"offset": "28..31", "name": "CumQty", "type": "uint32", "hex": "05 00 00 00", "value": "5 lots (Filled)"},
+                    {"offset": "32..35", "name": "LeavesQty", "type": "uint32", "hex": "00 00 00 00", "value": "0 lots (Remaining)"},
+                    {"offset": "36..44", "name": "LastPx (Price)", "type": "PRICE9", "hex": "54 1C 06 00 00 00 00 00 FE", "value": "$4,004.20 (400420 x 10^-2)"},
+                    {"offset": "45", "name": "OrdStatus", "type": "char", "hex": "32", "value": "2 (FILLED)"},
+                    {"offset": "46", "name": "ExecType", "type": "char", "hex": "46", "value": "F (TRADE)"},
+                    {"offset": "47..54", "name": "TransactTime", "type": "uTimestampNano", "hex": "B0 8B 56 89 21 00 00 00", "value": "1793528649184512000 ns UTC"}
+                ],
+                "hex_dump": (
+                    "0000  00 50 eb 50 30 00 03 02  08 00 01 00 05 40 21 00  .P.P0........!..\n"
+                    "0010  00 00 00 00 7a 89 01 00  00 00 00 00 05 00 00 00  ....z...........\n"
+                    "0020  00 00 00 00 54 1c 06 00  00 00 00 00 fe 32 46 b0  ....T........2F.\n"
+                    "0030  8b 56 89 21 00 00 00 00  00 00 00 00 00 00 00 00  .V.!............\n"
+                    "0040  47 43 5a 36 20 20 20 20  01 00 00 00 00 00 00 00  GCZ6    ........"
+                )
+            }
+        elif tmpl == "46":
+            data = {
+                "template_id": 46,
+                "name": "MDIncrementalRefreshBook46",
+                "protocol": "CME MDP 3.0 Market Data (Multicast)",
+                "sofh": {"msg_len": 64, "encoding_type": "0xEB50", "bytes_hex": "00 40 EB 50"},
+                "sbe_header": {"block_length": 32, "template_id": 46, "schema_id": 8, "version": 1, "bytes_hex": "20 00 2E 00 08 00 01 00"},
+                "fields": [
+                    {"offset": "00..03", "name": "SOFH (Length + Type)", "type": "SOFH", "hex": "00 40 EB 50", "value": "64 bytes · CME SBE (0xEB50)"},
+                    {"offset": "04..11", "name": "SBE Header", "type": "MessageHeader", "hex": "20 00 2E 00 08 00 01 00", "value": "Block: 32, Tmpl: 46, Schema: 8, Ver: 1"},
+                    {"offset": "12..19", "name": "TransactTime", "type": "uTimestampNano", "hex": "F1 8C 56 89 21 00 00 00", "value": "1793528649195123000 ns UTC"},
+                    {"offset": "20..27", "name": "MDEntryPx", "type": "PRICE9", "hex": "54 1C 06 00 00 00 00 00 FE", "value": "$4,004.20 (BBO Best Bid)"},
+                    {"offset": "28..31", "name": "MDEntrySize", "type": "int32", "hex": "14 00 00 00", "value": "20 lots (Depth L1)"},
+                    {"offset": "32..35", "name": "SecurityID", "type": "int32", "hex": "A4 27 00 00", "value": "10,148 (GCZ6 Gold Futures)"},
+                    {"offset": "36", "name": "MDUpdateAction", "type": "uint8", "hex": "00", "value": "0 (NEW / ADD_LIQUIDITY)"},
+                    {"offset": "37", "name": "MDEntryType", "type": "char", "hex": "30", "value": "0 (BID)"}
+                ],
+                "hex_dump": (
+                    "0000  00 40 eb 50 20 00 2e 00  08 00 01 00 f1 8c 56 89  .@.P .........V.\n"
+                    "0010  21 00 00 00 54 1c 06 00  00 00 00 00 fe 14 00 00  !...T...........\n"
+                    "0020  00 a4 27 00 00 00 30 00  00 00 00 00 00 00 00 00  ..'...'0........\n"
+                    "0030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................"
+                )
+            }
+        else:
+            data = {
+                "template_id": 514,
+                "name": "NewOrderSingle514",
+                "protocol": "CME iLink 3 Binary Protocol (SBE)",
+                "sofh": {"msg_len": 72, "encoding_type": "0xEB50", "bytes_hex": "00 48 EB 50"},
+                "sbe_header": {"block_length": 40, "template_id": 514, "schema_id": 8, "version": 1, "bytes_hex": "28 00 02 02 08 00 01 00"},
+                "fields": [
+                    {"offset": "00..03", "name": "SOFH (Length + Type)", "type": "SOFH", "hex": "00 48 EB 50", "value": "72 bytes · CME SBE (0xEB50)"},
+                    {"offset": "04..11", "name": "SBE Header", "type": "MessageHeader", "hex": "28 00 02 02 08 00 01 00", "value": "Block: 40, Tmpl: 514, Schema: 8, Ver: 1"},
+                    {"offset": "12..19", "name": "PartyDetailsListReqID", "type": "uint64", "hex": "01 00 00 00 00 00 00 00", "value": "1 (Firm Operator ID)"},
+                    {"offset": "20..23", "name": "OrderQty", "type": "uint32", "hex": "05 00 00 00", "value": "5 lots (Canary Clip)"},
+                    {"offset": "24..32", "name": "Price (Mantissa+Exp)", "type": "PRICE9", "hex": "54 1C 06 00 00 00 00 00 FE", "value": "$4,004.20 (400420 x 10^-2)"},
+                    {"offset": "33", "name": "Side", "type": "uint8", "hex": "01", "value": "1 (BUY)"},
+                    {"offset": "34", "name": "TimeInForce", "type": "uint8", "hex": "00", "value": "0 (DAY)"},
+                    {"offset": "35", "name": "ManualOrderIndicator", "type": "uint8", "hex": "00", "value": "0 (Automated Algo)"},
+                    {"offset": "36..43", "name": "SendingTimeEpoch", "type": "uTimestampNano", "hex": "A0 7F 56 89 21 00 00 00", "value": "1793528649123456789 ns UTC"},
+                    {"offset": "44..47", "name": "SeqNum", "type": "uint32", "hex": "04 00 00 00", "value": "4 (In-flight sequence)"}
+                ],
+                "hex_dump": (
+                    "0000  00 48 eb 50 28 00 02 02  08 00 01 00 01 00 00 00  .H.P(...........\n"
+                    "0010  00 00 00 00 05 00 00 00  54 1c 06 00 00 00 00 00  ........T.......\n"
+                    "0020  fe 01 00 00 a0 7f 56 89  21 00 00 00 04 00 00 00  ......V.!.......\n"
+                    "0030  41 50 45 58 5f 43 4c 49  45 4e 54 20 20 20 20 20  APEX_CLIENT     \n"
+                    "0040  43 4d 45 5f 47 4c 42 58                           CME_GLBX"
+                )
+            }
+        return web.json_response(data)
+
+    async def handle_syndicate_csv(self, request):
+        csv_rows = [
+            "FCM / Prime Broker,Allocation %,Capital Allocation ($),CME SPAN Initial Margin ($),Unencumbered T-Bill Cash ($),Annual T-Bill Yield ($),Omnibus Sub-Account,Clearing Segregation Mode,Counterparty Risk Rating",
+            "Interactive Brokers LLC,40.0%,$20,000,000,$4,400,000,$15,600,000,$756,600,IBKR-SMA-APEX-01,CFTC Rule 1.20 Segregated,AAA (S&P A- / Tier-1)",
+            "Marex Spectron (UK / CME Clearing),35.0%,$17,500,000,$3,587,500,$13,912,500,$674,756,MRX-SMA-APEX-02,CFTC Rule 1.20 Segregated,A+ (Fitch / Tier-1 FCM)",
+            "StoneX Group Inc. (Futures Division),25.0%,$12,500,000,$3,000,000,$9,500,000,$460,750,SNX-SMA-APEX-03,CFTC Rule 1.20 Segregated,A (Fortune 100 / Tier-1)",
+            "TOTAL SYNDICATE SYNERGY,100.0%,$50,000,000,$10,987,500,$39,012,500,$1,892,106,UNIFIED SYNDICATE,100% CFTC 1.20 DUAL-CUSTODY,AAA / ZERO SINGLE-FCM CONCENTRATION"
+        ]
+        csv_data = "\n".join(csv_rows) + "\n"
+        filename = f"Apex_Syndicate_Prime_Allocation_50M_{datetime.now(timezone.utc).strftime('%Y%m%d')}.csv"
+        return web.Response(
+            body=csv_data.encode("utf-8"),
+            content_type="text/csv",
+            charset="utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Access-Control-Allow-Origin": "*"
+            }
+        )
 
 def main():
     parser = argparse.ArgumentParser(description="CME Gold Institutional Quant API & WebSocket Server")

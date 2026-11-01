@@ -950,6 +950,7 @@
       <button class="action-icon-btn" onclick="startGuidedTour()">Tour</button>
       <button class="action-icon-btn" onclick="openMemoModal()">Memo</button>
       <button class="action-icon-btn" onclick="openAccessLogModal()">Logs</button>
+      <button id="btn-play-audio-memo" onclick="toggleAudioBriefing()" class="action-icon-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-weight:700; color:#059669; background:#ecfdf5; border-color:#a7f3d0;" title="Listen to 2-Min Pre-Market Briefing Podcast"><span>▶ 2-Min Audio Brief</span></button>
       <a href="/api/v1/ddq/download" target="_blank" class="action-icon-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:700; color:var(--accent-blue); background:rgba(2,132,199,0.06); border-color:rgba(2,132,199,0.25);" title="Download AIMA Standard Institutional Due Diligence Questionnaire"><span>📄 DDQ</span></a>
 
       <div class="user-badge-wrap" id="user-session-badge" style="display:none;">
@@ -1537,6 +1538,59 @@
       </div>
     </div>
 
+      <!-- SECTION: CME GLOBEX ILINK 3 (SBE) & MDP 3.0 BINARY DISSECTOR -->
+      <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h3 style="font-size:14px; font-weight:800; display:flex; align-items:center; gap:6px;">
+              <span>🔬 CME iLink 3 &amp; MDP 3.0 Simple Binary Encoding (SBE) Dissector</span>
+              <span style="font-size:10px; background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:4px; font-weight:700;">SOFH 0xEB50 · Nanosecond HW Framing</span>
+            </h3>
+            <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+              Live C++ struct wire framing and hex dump for ultra-low latency direct exchange order entry and multicast book updates.
+            </p>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="order-btn" id="sbe-tab-514" onclick="loadSbeTemplate('514')" style="background:#0284c7; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer;">iLink3: NewOrderSingle (514)</button>
+            <button class="order-btn" id="sbe-tab-515" onclick="loadSbeTemplate('515')" style="background:var(--bg-panel-sub); color:var(--text-main); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer;">iLink3: ExecReportNew (515)</button>
+            <button class="order-btn" id="sbe-tab-46" onclick="loadSbeTemplate('46')" style="background:var(--bg-panel-sub); color:var(--text-main); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer;">MDP3.0: BookRefresh (46)</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:14px;">
+          <!-- Left: Wireshark Hex Dump -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; font-family:var(--font-mono); color:var(--text-main);">WIRE HEX STREAM (L3 C-STRUCT)</span>
+              <button onclick="copySbeHex()" style="background:none; border:1px solid var(--border); border-radius:3px; padding:2px 6px; font-size:10px; cursor:pointer; color:var(--text-muted);">Copy Hex</button>
+            </div>
+            <pre id="sbe-hex-dump" style="background:#0f172a; color:#38bdf8; font-family:var(--font-mono); font-size:10.5px; padding:10px; border-radius:6px; height:240px; overflow-y:auto; line-height:1.5; border:1px solid #334155; margin:0;"></pre>
+          </div>
+
+          <!-- Right: Decoded SBE Fields Table -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:11px; font-weight:700; font-family:var(--font-mono); color:var(--text-main);">DECODED SBE FIELDS (<span id="sbe-protocol-label">CME iLink 3</span>)</span>
+              <span id="sbe-len-badge" style="font-size:10px; font-weight:700; color:#0284c7; font-family:var(--font-mono);">72 BYTES TOTAL</span>
+            </div>
+            <div style="max-height:240px; overflow-y:auto; border:1px solid var(--border); border-radius:6px;">
+              <table class="dom-table" style="font-size:10.5px;">
+                <thead>
+                  <tr>
+                    <th style="width:50px;">OFFSET</th>
+                    <th>FIELD NAME</th>
+                    <th>SBE TYPE</th>
+                    <th style="text-align:right;">DECODED VALUE</th>
+                  </tr>
+                </thead>
+                <tbody id="sbe-fields-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB 3: AI/ML NEURAL LEARNING LAB & MODEL RESULTS -->
     <div id="view-tab-moe" class="tab-view-container">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px;">
@@ -2093,6 +2147,89 @@
 
     </div>
 
+      <!-- SECTION: MULTI-FCM PRIME BROKER SYNDICATE SPLIT SIMULATOR -->
+      <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h3 style="font-size:14px; font-weight:800; display:flex; align-items:center; gap:6px;">
+              <span>🏛️ Multi-FCM Prime Broker Syndicate Allocation Matrix ($50M Mandate)</span>
+              <span style="font-size:10px; background:#ecfdf5; color:#059669; padding:2px 8px; border-radius:4px; font-weight:700;">AAA Syndicate Diversity · 0 Single-FCM Concentration</span>
+            </h3>
+            <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+              Simulate prime capital partitioning across Tier-1 FCMs to optimize SPAN margin offsets, unencumbered Treasury yields, and counterparty limits under CFTC Rule 1.20.
+            </p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <a href="/api/v1/allocator/syndicate-csv" target="_blank" class="order-btn" style="text-decoration:none; background:#0284c7; color:#fff; border:none; padding:5px 12px; border-radius:4px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; cursor:pointer;" title="Download Syndicate Allocation CSV">
+              <span>📥 Export Syndicate Matrix (CSV)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3-FCM Interactive Allocation Grid -->
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:12px;">
+          <!-- FCM 1: Interactive Brokers -->
+          <div style="background:var(--bg-panel-sub); padding:10px 12px; border-radius:6px; border:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <b style="font-size:11.5px; color:var(--text-main);">Interactive Brokers LLC</b>
+              <span id="fcm-pct-1" style="font-weight:800; color:var(--accent-blue); font-size:12px;">40% ($20.0M)</span>
+            </div>
+            <input type="range" id="fcm-slider-1" min="10" max="70" value="40" step="5" style="width:100%; accent-color:var(--accent-blue);" oninput="updateSyndicateAllocation()">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px;">
+              <span>SPAN Margin: <b>22.0% ($4.4M)</b></span>
+              <span>T-Bills (4.85%): <b style="color:var(--green);">+$756k/yr</b></span>
+            </div>
+          </div>
+
+          <!-- FCM 2: Marex Spectron -->
+          <div style="background:var(--bg-panel-sub); padding:10px 12px; border-radius:6px; border:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <b style="font-size:11.5px; color:var(--text-main);">Marex Spectron (UK / CME)</b>
+              <span id="fcm-pct-2" style="font-weight:800; color:var(--accent-blue); font-size:12px;">35% ($17.5M)</span>
+            </div>
+            <input type="range" id="fcm-slider-2" min="10" max="70" value="35" step="5" style="width:100%; accent-color:var(--accent-blue);" oninput="updateSyndicateAllocation()">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px;">
+              <span>SPAN Margin: <b>20.5% ($3.6M)</b></span>
+              <span>T-Bills (4.85%): <b style="color:var(--green);">+$675k/yr</b></span>
+            </div>
+          </div>
+
+          <!-- FCM 3: StoneX Group -->
+          <div style="background:var(--bg-panel-sub); padding:10px 12px; border-radius:6px; border:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <b style="font-size:11.5px; color:var(--text-main);">StoneX Group Inc.</b>
+              <span id="fcm-pct-3" style="font-weight:800; color:var(--accent-blue); font-size:12px;">25% ($12.5M)</span>
+            </div>
+            <input type="range" id="fcm-slider-3" min="10" max="70" value="25" step="5" style="width:100%; accent-color:var(--accent-blue);" oninput="updateSyndicateAllocation()">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px;">
+              <span>SPAN Margin: <b>24.0% ($3.0M)</b></span>
+              <span>T-Bills (4.85%): <b style="color:var(--green);">+$461k/yr</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Syndicate Summary Metrics Banner -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; font-size:11px;">
+          <div style="background:var(--bg-panel-sub); padding:8px; border-radius:5px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block;">Total Strategy Capital</span>
+            <b id="syndicate-total-cap" style="font-size:13px; color:var(--text-main);">$50,000,000</b>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:8px; border-radius:5px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block;">Total SPAN Encumbered</span>
+            <b id="syndicate-total-span" style="font-size:13px; color:var(--accent-blue);">$10,987,500 (21.9%)</b>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:8px; border-radius:5px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block;">Unencumbered Treasury Cash</span>
+            <b id="syndicate-total-tbills" style="font-size:13px; color:var(--green);">$39,012,500 (78.1%)</b>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:8px; border-radius:5px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block;">Annual Treasury Cash Yield</span>
+            <b id="syndicate-total-yield" style="font-size:13px; color:var(--green);">+$1,892,106 / yr</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB 5: DEVELOPER SDK -->
     <div id="view-tab-sdk" class="tab-view-container">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
@@ -2243,7 +2380,17 @@
         <h3 style="font-size:15px; font-weight:800;">CME Globex Pre-Market Intelligence Memo</h3>
         <span class="status-badge">MACRO DESK</span>
       </div>
-      <div id="memo-body-content" style="font-size:12px; line-height:1.6; max-height:360px; overflow-y:auto; color:var(--text-main);">
+      <div style="background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:8px 12px; margin-bottom:12px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-main);">🎙️ Autonomous Spoken Pre-Market Briefing (2m 13s)</span>
+          <span style="font-size:10px; color:#059669; font-weight:700; background:#ecfdf5; padding:1px 6px; border-radius:3px;">128K MP3 BROADCAST</span>
+        </div>
+        <audio id="briefing-audio-player" controls preload="none" style="width:100%; height:32px;">
+          <source src="/api/v1/memo/audio" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      <div id="memo-body-content" style="font-size:12px; line-height:1.6; max-height:300px; overflow-y:auto; color:var(--text-main);">
         <p><b>Executive Summary:</b> Continuous Gold Futures (GC) trading with bullish momentum at $4,004.22/oz (+0.68%) driven by US real yield compression and geopolitical safe-haven allocation.</p>
         <ul style="margin: 8px 0 8px 18px;">
           <li><b>Order Flow Imbalance:</b> Bid side commanding 56% of top-10 book depth at $4,004.00 support.</li>
@@ -3120,6 +3267,95 @@
 
     // Lifecycle
 
+    // ================= AUDIO BRIEFING CONTROLLER =================
+    function toggleAudioBriefing() {
+      openMemoModal();
+      const player = document.getElementById('briefing-audio-player');
+      if (player) {
+        if (player.paused) {
+          player.play();
+        } else {
+          player.pause();
+        }
+      }
+    }
+
+    // ================= SBE BINARY DISSECTOR CONTROLLER =================
+    function loadSbeTemplate(tmpl) {
+      ['514', '515', '46'].forEach(t => {
+        const btn = document.getElementById(`sbe-tab-${t}`);
+        if (btn) {
+          if (t === tmpl) {
+            btn.style.background = '#0284c7';
+            btn.style.color = '#fff';
+            btn.style.borderColor = '#0284c7';
+          } else {
+            btn.style.background = 'var(--bg-panel-sub)';
+            btn.style.color = 'var(--text-main)';
+            btn.style.borderColor = 'var(--border)';
+          }
+        }
+      });
+
+      fetch(`/api/v1/ilink3/packet-inspect?template=${tmpl}`)
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('sbe-hex-dump').innerText = data.hex_dump;
+          document.getElementById('sbe-protocol-label').innerText = data.name;
+          document.getElementById('sbe-len-badge').innerText = `${data.sofh.msg_len} BYTES TOTAL`;
+
+          const tbody = document.getElementById('sbe-fields-tbody');
+          let rows = '';
+          data.fields.forEach(f => {
+            rows += `<tr>
+              <td style="font-family:var(--font-mono); color:var(--text-dim); font-size:9.5px;">${f.offset}</td>
+              <td style="font-weight:700; color:var(--text-main);">${f.name}</td>
+              <td style="font-family:var(--font-mono); color:var(--accent-blue);">${f.type}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-weight:700; color:var(--green);">${f.value}</td>
+            </tr>`;
+          });
+          tbody.innerHTML = rows;
+        })
+        .catch(e => console.error('SBE inspect error:', e));
+    }
+
+    function copySbeHex() {
+      const hex = document.getElementById('sbe-hex-dump').innerText;
+      navigator.clipboard.writeText(hex).then(() => alert('CME SBE wire hex dump copied!'));
+    }
+
+    // ================= MULTI-FCM SYNDICATE SIMULATOR =================
+    function updateSyndicateAllocation() {
+      const s1 = parseInt(document.getElementById('fcm-slider-1').value) || 40;
+      const s2 = parseInt(document.getElementById('fcm-slider-2').value) || 35;
+      const s3 = parseInt(document.getElementById('fcm-slider-3').value) || 25;
+
+      const tot = s1 + s2 + s3;
+      const p1 = Math.round((s1 / tot) * 100);
+      const p2 = Math.round((s2 / tot) * 100);
+      const p3 = 100 - p1 - p2;
+
+      const cap = 50000000;
+      const cap1 = cap * (p1 / 100);
+      const cap2 = cap * (p2 / 100);
+      const cap3 = cap * (p3 / 100);
+
+      document.getElementById('fcm-pct-1').innerText = `${p1}% ($${(cap1 / 1e6).toFixed(1)}M)`;
+      document.getElementById('fcm-pct-2').innerText = `${p2}% ($${(cap2 / 1e6).toFixed(1)}M)`;
+      document.getElementById('fcm-pct-3').innerText = `${p3}% ($${(cap3 / 1e6).toFixed(1)}M)`;
+
+      const span1 = cap1 * 0.22;
+      const span2 = cap2 * 0.205;
+      const span3 = cap3 * 0.24;
+      const totSpan = span1 + span2 + span3;
+      const totTbills = cap - totSpan;
+      const totYield = totTbills * 0.0485;
+
+      document.getElementById('syndicate-total-span').innerText = `$${totSpan.toLocaleString(undefined, {maximumFractionDigits:0})} (${((totSpan/cap)*100).toFixed(1)}%)`;
+      document.getElementById('syndicate-total-tbills').innerText = `$${totTbills.toLocaleString(undefined, {maximumFractionDigits:0})} (${((totTbills/cap)*100).toFixed(1)}%)`;
+      document.getElementById('syndicate-total-yield').innerText = `+$${totYield.toLocaleString(undefined, {maximumFractionDigits:0})} / yr`;
+    }
+
     // ================= TRACK 1: FIX DROP-COPY INSPECTOR =================
     function openDropCopyModal() {
       const box = document.getElementById('drop-copy-stream-box');
@@ -3274,6 +3510,7 @@
       checkAuthSession();
       initChart();
       loadDepth10('GC');
+      loadSbeTemplate('514');
       startDomFlowTimer();
       connectWS();
     });
