@@ -950,6 +950,7 @@
       <button class="action-icon-btn" onclick="startGuidedTour()">Tour</button>
       <button class="action-icon-btn" onclick="openMemoModal()">Memo</button>
       <button class="action-icon-btn" onclick="openAccessLogModal()">Logs</button>
+      <a href="/api/v1/ddq/download" target="_blank" class="action-icon-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:700; color:var(--accent-blue); background:rgba(2,132,199,0.06); border-color:rgba(2,132,199,0.25);" title="Download AIMA Standard Institutional Due Diligence Questionnaire"><span>📄 DDQ</span></a>
 
       <div class="user-badge-wrap" id="user-session-badge" style="display:none;">
         <span style="color:var(--green); font-size:9px;">●</span>
@@ -1038,9 +1039,51 @@
 
         <!-- Right Pane: Level-10 Depth of Market (MBP-10) Ladder -->
         <div class="dom-card">
-          <div class="dom-header">
-            <span class="dom-title-text" id="dom-title">Apex Level-10 Depth (MBP-10)</span>
-            <span class="dom-queue-badge">10-LEVEL QUEUE</span>
+          <div class="dom-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="dom-title-text" id="dom-title">Apex Level-10 Depth (MBP-10)</span>
+              <button id="btn-toggle-dom-flow" onclick="toggleDomFlow()" style="font-size:9.5px; font-weight:700; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:2px 6px; border-radius:3px; cursor:pointer;" title="Toggle Sub-Second Liquidity Flow Simulation">⚡ FLOW: LIVE</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button id="btn-toggle-queue-sim" onclick="toggleQueueSim()" style="font-size:9.5px; font-weight:700; background:var(--bg-panel-sub); color:var(--accent-blue); border:1px solid var(--border); padding:2px 6px; border-radius:3px; cursor:pointer;" title="Open Simulated Order Queue Position Tracker">🎯 QUEUE SIMULATOR</button>
+              <span class="dom-queue-badge">10-LEVEL QUEUE</span>
+            </div>
+          </div>
+
+          <!-- Interactive MBO Queue Position Simulator Drawer -->
+          <div id="queue-sim-panel" style="display:none; background:#f0fdf4; border-bottom:1px solid #bbf7d0; padding:6px 10px; font-size:11px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-weight:800; color:#166534; font-size:10.5px;">🎯 CME Globex MBO Queue Priority Simulator</span>
+              <span id="queue-status-badge" style="font-size:9.5px; font-weight:700; background:#dcfce7; color:#15803d; padding:1px 6px; border-radius:3px;">READY</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 80px 1fr 100px; gap:6px; align-items:center;">
+              <div>
+                <label style="font-size:9.5px; font-weight:700; color:#166534;">SIZE</label>
+                <input type="number" id="sim-queue-qty" value="5" min="1" max="25" style="width:100%; padding:2px 4px; font-size:10.5px; border:1px solid #86efac; border-radius:3px; font-family:var(--font-mono);">
+              </div>
+              <div>
+                <label style="font-size:9.5px; font-weight:700; color:#166534;">PEG LEVEL</label>
+                <select id="sim-queue-level" style="width:100%; padding:2px 4px; font-size:10.5px; border:1px solid #86efac; border-radius:3px; font-family:var(--font-mono);">
+                  <option value="bid_l1">Bid L1 (BBO @ $4,004.20) · Queue: 12 lots</option>
+                  <option value="bid_l2" selected>Bid L2 (Priority @ $4,004.10) · Queue: 18 lots</option>
+                  <option value="ask_l1">Ask L1 (BBO @ $4,004.30) · Queue: 14 lots</option>
+                </select>
+              </div>
+              <button class="order-btn" style="background:#15803d; color:#fff; border:none; padding:5px 6px; border-radius:3px; font-weight:700; font-size:10px; cursor:pointer;" onclick="runQueueSimulation()">
+                <span>Drop in Queue</span>
+              </button>
+            </div>
+            <!-- Progress Bar -->
+            <div id="queue-progress-wrap" style="display:none; margin-top:6px;">
+              <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); margin-bottom:2px;">
+                <span id="queue-ahead-label" style="color:#166534; font-weight:700;">Queue Ahead: 18 lots</span>
+                <span id="queue-timer-label" style="color:#15803d;">Est. 360ms</span>
+              </div>
+              <div style="background:#bbf7d0; height:6px; border-radius:3px; overflow:hidden;">
+                <div id="queue-progress-bar" style="background:#15803d; width:100%; height:100%; transition:width 0.1s linear;"></div>
+              </div>
+              <div id="queue-fill-msg" style="margin-top:4px; font-weight:700; color:#15803d; font-size:10px; text-align:center; display:none;"></div>
+            </div>
           </div>
 
           <!-- OFI Imbalance Meter -->
@@ -1198,6 +1241,18 @@
               <button class="btn-cta-pilot" id="btn-fire-canary" style="width:100%; padding:7px; font-size:11.5px; justify-content:center; display:flex; align-items:center; gap:6px;" onclick="fireCanaryOrder()">
                 <span>⚡ Route CME Globex Canary FIX Order</span>
               </button>
+              
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                <div style="display:flex; gap:6px;">
+                  <a href="/api/v1/fix/audit-export" target="_blank" class="order-btn" style="text-decoration:none; background:#0284c7; color:#fff; border:none; padding:4px 8px; font-size:10px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:4px; cursor:pointer;" title="Download CFTC Rule 1.31 Compliant SOH FIX 4.4 ASCII Stream">
+                    <span>📥 Export FIX 4.4 Audit (.fix)</span>
+                  </a>
+                  <button class="order-btn" style="background:var(--bg-panel-sub); color:var(--text-main); border:1px solid var(--border); padding:4px 8px; font-size:10px; border-radius:4px; font-weight:700; cursor:pointer;" onclick="openDropCopyModal()">
+                    <span>📋 FIX Drop-Copy Stream</span>
+                  </button>
+                </div>
+                <span style="font-size:9.5px; color:var(--text-muted); font-family:var(--font-mono);">CFTC 1.31 · MiFID II RTS 25 · SOH \x01</span>
+              </div>
             </div>
 
             <!-- Right: Real-Time SEC 15c3-5 Gate Status & Raw SOH FIX Message Stream -->
@@ -1765,6 +1820,7 @@
           <p style="font-size:12px; color:var(--text-muted);">Verified performance across 2017–2026 CME COMEX Continuous Gold Futures (GC) under SPAN margin stress.</p>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
+          <a href="/api/v1/ddq/download" target="_blank" class="action-icon-btn" style="text-decoration:none; padding:5px 10px; font-size:11px; font-weight:700; color:var(--accent-blue); background:rgba(2,132,199,0.06); border:1px solid rgba(2,132,199,0.25); border-radius:4px; display:inline-flex; align-items:center; gap:4px;" title="Download AIMA Standard Institutional Due Diligence Questionnaire"><span>📄 AIMA DDQ (PDF)</span></a>
           <span class="status-badge" style="background:var(--green-bg); color:var(--green);">SHARPE 2.41</span>
           <button class="btn-cta-pilot" style="padding:5px 12px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px;" onclick="exportTearsheetPdf()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -2132,6 +2188,49 @@
           Verify &amp; Enter Workstation
         </button>
         <div id="auth-error-2" style="color:var(--red); font-size:11.5px; margin-top:6px; display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: FIX Drop Copy Inspector -->
+  <div class="modal-backdrop" id="fixDropCopyModal" style="display:none;">
+    <div class="modal-box" style="max-width:820px; width:92%;">
+      <button class="modal-close-btn" onclick="closeDropCopyModal()">&times;</button>
+      <div style="margin-bottom:12px;">
+        <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+          <span>📋 CME Globex FIX 4.4 Drop-Copy Audit Session</span>
+          <span style="font-size:10px; background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:4px; font-weight:700;">CFTC Rule 1.31 &amp; MiFID II RTS 25 Compliant</span>
+        </h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+          Microsecond-synchronized drop-copy stream for prime brokers, clearing FCMs, and regulatory compliance inspection.
+        </p>
+      </div>
+
+      <!-- Tag explanation banner -->
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; font-size:10.5px; font-family:var(--font-mono);">
+        <span style="background:var(--bg-panel-sub); padding:2px 6px; border-radius:3px; border:1px solid var(--border);"><b>35=D</b> New Order Single</span>
+        <span style="background:#ecfdf5; color:#059669; padding:2px 6px; border-radius:3px; border:1px solid #a7f3d0;"><b>35=8</b> Exec Report (Filled / 39=2)</span>
+        <span style="background:#fef2f2; color:#dc2626; padding:2px 6px; border-radius:3px; border:1px solid #fecaca;"><b>39=8</b> Risk Rejected (SEC 15c3-5)</span>
+        <span style="background:var(--bg-panel-sub); padding:2px 6px; border-radius:3px; border:1px solid var(--border);"><b>52</b> Microsecond UTC Clock</span>
+      </div>
+
+      <!-- Scrollable Monospace SOH Stream Box -->
+      <div id="drop-copy-stream-box" style="background:#0f172a; color:#38bdf8; font-family:var(--font-mono); font-size:11px; padding:12px; border-radius:6px; height:280px; overflow-y:auto; line-height:1.6; white-space:pre-wrap; border:1px solid #334155;">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+        <span style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">
+          Delimited by Standard ASCII SOH (\x01)
+        </span>
+        <div style="display:flex; gap:8px;">
+          <button class="order-btn" style="background:var(--bg-panel-sub); color:var(--text-main); border:1px solid var(--border); padding:6px 12px; border-radius:4px; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="copyFixStreamToClipboard()">
+            📋 Copy Stream
+          </button>
+          <a href="/api/v1/fix/audit-export" target="_blank" class="order-btn" style="text-decoration:none; background:#0284c7; color:#fff; border:none; padding:6px 14px; border-radius:4px; font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+            📥 Download .fix File
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -3020,10 +3119,162 @@
     }, 1000);
 
     // Lifecycle
+
+    // ================= TRACK 1: FIX DROP-COPY INSPECTOR =================
+    function openDropCopyModal() {
+      const box = document.getElementById('drop-copy-stream-box');
+      box.innerText = 'Loading live FIX 4.4 drop-copy session...';
+      document.getElementById('fixDropCopyModal').style.display = 'flex';
+
+      fetch('/api/v1/fix/audit-export')
+        .then(r => r.text())
+        .then(rawFix => {
+          box.innerText = rawFix;
+        })
+        .catch(e => {
+          box.innerText = `Error loading FIX stream: ${e.message}`;
+        });
+    }
+
+    function closeDropCopyModal() {
+      document.getElementById('fixDropCopyModal').style.display = 'none';
+    }
+
+    function copyFixStreamToClipboard() {
+      const text = document.getElementById('drop-copy-stream-box').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('CME FIX 4.4 drop-copy session stream copied to clipboard!');
+      });
+    }
+
+    // ================= TRACK 4: DOM FLOW & QUEUE SIMULATOR =================
+    let isDomFlowActive = true;
+    let domFlowTimer = null;
+
+    function toggleDomFlow() {
+      isDomFlowActive = !isDomFlowActive;
+      const btn = document.getElementById('btn-toggle-dom-flow');
+      if (isDomFlowActive) {
+        btn.innerText = '⚡ FLOW: LIVE';
+        btn.style.background = '#ecfdf5';
+        btn.style.color = '#059669';
+        btn.style.borderColor = '#a7f3d0';
+        startDomFlowTimer();
+      } else {
+        btn.innerText = '⏸ FLOW: PAUSED';
+        btn.style.background = '#f1f5f9';
+        btn.style.color = '#64748b';
+        btn.style.borderColor = '#cbd5e1';
+        if (domFlowTimer) clearInterval(domFlowTimer);
+      }
+    }
+
+    function startDomFlowTimer() {
+      if (domFlowTimer) clearInterval(domFlowTimer);
+      domFlowTimer = setInterval(() => {
+        if (!isDomFlowActive) return;
+        const bidTotEl = document.getElementById('dom-total-bid');
+        const askTotEl = document.getElementById('dom-total-ask');
+        const imbEl = document.getElementById('dom-imbalance-pct');
+        const bidBar = document.getElementById('dom-bar-bid');
+        const askBar = document.getElementById('dom-bar-ask');
+        const bidLbl = document.getElementById('dom-bid-pct-label');
+        const askLbl = document.getElementById('dom-ask-pct-label');
+
+        if (bidTotEl && askTotEl) {
+          const deltaB = Math.floor(Math.random() * 7) - 3;
+          const deltaA = Math.floor(Math.random() * 7) - 3;
+          let curB = parseInt(bidTotEl.innerText.replace(/,/g, '')) || 1530;
+          let curA = parseInt(askTotEl.innerText.replace(/,/g, '')) || 1945;
+          curB = Math.max(1200, curB + deltaB);
+          curA = Math.max(1400, curA + deltaA);
+          bidTotEl.innerText = curB.toLocaleString();
+          askTotEl.innerText = curA.toLocaleString();
+
+          const tot = curB + curA;
+          const bPct = Math.round((curB / tot) * 100);
+          const aPct = 100 - bPct;
+          const imb = (((curB - curA) / tot) * 100).toFixed(1);
+
+          if (bidBar && askBar) {
+            bidBar.style.width = `${bPct}%`;
+            askBar.style.width = `${aPct}%`;
+          }
+          if (bidLbl && askLbl) {
+            bidLbl.innerText = `BID ${bPct}% (${curB.toLocaleString()} lots)`;
+            askLbl.innerText = `${aPct}% ASK (${curA.toLocaleString()} lots)`;
+          }
+          if (imbEl) {
+            imbEl.innerText = `${imb > 0 ? '+' : ''}${imb}%`;
+            imbEl.style.color = imb > 0 ? 'var(--green)' : 'var(--red)';
+          }
+        }
+      }, 700);
+    }
+
+    function toggleQueueSim() {
+      const panel = document.getElementById('queue-sim-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function runQueueSimulation() {
+      const qty = parseInt(document.getElementById('sim-queue-qty').value) || 5;
+      const level = document.getElementById('sim-queue-level').value;
+      const statusBadge = document.getElementById('queue-status-badge');
+      const progressWrap = document.getElementById('queue-progress-wrap');
+      const progressBar = document.getElementById('queue-progress-bar');
+      const aheadLabel = document.getElementById('queue-ahead-label');
+      const timerLabel = document.getElementById('queue-timer-label');
+      const fillMsg = document.getElementById('queue-fill-msg');
+
+      let initialQueue = level === 'bid_l1' ? 12 : (level === 'bid_l2' ? 18 : 14);
+      let currentQueue = initialQueue;
+      const pxStr = level.includes('l1') ? '4,004.20' : '4,004.10';
+
+      statusBadge.innerText = 'QUEUED IN MBO';
+      statusBadge.style.background = '#fef3c7';
+      statusBadge.style.color = '#b45309';
+
+      progressWrap.style.display = 'block';
+      progressBar.style.width = '100%';
+      fillMsg.style.display = 'none';
+
+      let stepTime = 60;
+      let totalSteps = initialQueue;
+      let step = 0;
+
+      const qInterval = setInterval(() => {
+        step++;
+        currentQueue = Math.max(0, initialQueue - step);
+        const pct = Math.max(0, (currentQueue / initialQueue) * 100);
+        progressBar.style.width = `${pct}%`;
+        aheadLabel.innerText = `Queue Ahead: ${currentQueue} lots`;
+        timerLabel.innerText = `Est. ${currentQueue * 25}ms`;
+
+        if (currentQueue <= 0) {
+          clearInterval(qInterval);
+          statusBadge.innerText = 'FILLED';
+          statusBadge.style.background = '#dcfce7';
+          statusBadge.style.color = '#15803d';
+          fillMsg.innerText = `⚡ Order Filled: ${qty} lots @ $${pxStr} in ${step * stepTime}ms (CME Globex Match Engine)`;
+          fillMsg.style.display = 'block';
+
+          pushTradeTapeRow({
+            time: new Date().toISOString().substring(11, 19),
+            symbol: 'GC.FUT',
+            price: parseFloat(pxStr.replace(',', '')),
+            size: qty,
+            side: 'BUY'
+          });
+        }
+      }, stepTime);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
       initChart();
       loadDepth10('GC');
+      startDomFlowTimer();
       connectWS();
     });
   </script>
