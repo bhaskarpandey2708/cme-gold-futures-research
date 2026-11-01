@@ -1310,6 +1310,159 @@
         </div>
       </section>
 
+      <!-- SPRINT 54: TRACK 1 & TRACK 4 MICROSTRUCTURE & EXECUTION SUITE -->
+      <section style="display:grid; grid-template-columns: 1fr 1.35fr; gap:10px; margin-top:6px;">
+
+        <!-- CARD 1: VPIN Order Flow Toxicity Radar (Track 1) -->
+        <div class="panel" style="padding:14px; background:var(--bg-panel); border:1px solid var(--border); border-radius:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:6px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--green);"></span>
+                <h3 style="font-size:13px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.04em;">VPIN Microstructure Toxicity Radar</h3>
+              </div>
+              <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Volume-Synchronized Probability of Toxicity (Easley, López de Prado, O'Hara 2012)</p>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <select id="vpin-symbol-select" onchange="fetchVpinToxicity()" style="font-size:11px; padding:3px 8px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+                <option value="GC" selected>GC (Gold)</option>
+                <option value="SI">SI (Silver)</option>
+                <option value="CL">CL (Crude Oil)</option>
+                <option value="ES">ES (E-mini S&P)</option>
+                <option value="BTC">BTC (Bitcoin)</option>
+              </select>
+              <button onclick="fetchVpinToxicity()" class="action-btn" style="padding:3px 8px; font-size:10.5px; background:var(--accent-blue); color:#fff; border:none; border-radius:4px; cursor:pointer;">Refresh</button>
+            </div>
+          </div>
+
+          <!-- Top Gauge Banner -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+            <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); text-align:center;">
+              <span style="font-size:10px; color:var(--text-muted); text-transform:uppercase; font-weight:700; display:block;">Current VPIN Metric</span>
+              <div style="font-size:22px; font-weight:900; color:var(--text-main); font-family:var(--font-mono); margin:2px 0;" id="vpin-display-val">0.2840</div>
+              <span id="vpin-regime-badge" style="display:inline-block; padding:2px 8px; font-size:10px; font-weight:800; border-radius:4px; background:#dcfce7; color:#15803d;">NORMAL FLOW (TIGHT)</span>
+            </div>
+            <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); font-size:11px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span style="color:var(--text-muted);">Toxicity Percentile:</span>
+                <b id="vpin-percentile-val" style="color:var(--accent-blue);">40.6% (CDF)</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span style="color:var(--text-muted);">Bucket Size:</span>
+                <b id="vpin-bucket-size">500 Contracts</b>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted);">Adverse Selection:</span>
+                <b id="vpin-adverse-risk" style="color:var(--green);">Low (&lt;0.2 bps)</b>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sparkline representation of Volume Buckets -->
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-bottom:4px; font-weight:700;">
+              <span>RECENT VOLUME IMBALANCE BARS (|V_B - V_S|)</span>
+              <span id="vpin-bars-legend">50-Bucket Rolling Window</span>
+            </div>
+            <div id="vpin-sparkline-container" style="display:flex; align-items:flex-end; gap:3px; height:48px; background:var(--bg-panel-sub); border:1px solid var(--border); border-radius:4px; padding:4px 6px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: Almgren-Chriss Execution Algo Simulator (Track 4) -->
+        <div class="panel" style="padding:14px; background:var(--bg-panel); border:1px solid var(--border); border-radius:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:6px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-blue);"></span>
+                <h3 style="font-size:13px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.04em;">Almgren-Chriss Optimal Execution Simulator</h3>
+              </div>
+              <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">TWAP, VWAP, POV &amp; Iceberg Slicing with Temporary vs Permanent Market Impact</p>
+            </div>
+            <button onclick="runAlgoSimulation()" class="action-btn" style="padding:4px 10px; font-size:11px; font-weight:800; background:var(--accent-blue); color:#fff; border:none; border-radius:4px; cursor:pointer;">▶ Run Algo Slicing</button>
+          </div>
+
+          <!-- Algo Parameter Inputs -->
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:10px; font-size:11px;">
+            <div>
+              <label style="display:block; font-size:9.5px; color:var(--text-muted); font-weight:700;">PARENT ORDER SIZE</label>
+              <select id="algo-sim-qty" style="width:100%; padding:3px 6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+                <option value="25">25 Lots ($6.85M)</option>
+                <option value="50" selected>50 Lots ($13.7M)</option>
+                <option value="100">100 Lots ($27.4M)</option>
+                <option value="250">250 Lots ($68.5M)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:9.5px; color:var(--text-muted); font-weight:700;">ALGO STRATEGY</label>
+              <select id="algo-sim-type" style="width:100%; padding:3px 6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+                <option value="VWAP" selected>VWAP (U-Curve)</option>
+                <option value="TWAP">TWAP (Equal Slices)</option>
+                <option value="POV_15">POV (15% Tape)</option>
+                <option value="ICEBERG">Synthetic Iceberg</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:9.5px; color:var(--text-muted); font-weight:700;">DURATION</label>
+              <select id="algo-sim-duration" style="width:100%; padding:3px 6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+                <option value="15">15 Mins</option>
+                <option value="30" selected>30 Mins</option>
+                <option value="60">60 Mins</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:9.5px; color:var(--text-muted); font-weight:700;">EXECUTION SIDE</label>
+              <select id="algo-sim-side" style="width:100%; padding:3px 6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+                <option value="BUY" selected>BUY (Passive)</option>
+                <option value="SELL">SELL (Liquidate)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Algo Execution Summary Banner -->
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; background:var(--bg-panel-sub); padding:8px; border-radius:6px; border:1px solid var(--border); margin-bottom:10px; font-size:11px; text-align:center;">
+            <div>
+              <span style="font-size:9px; color:var(--text-muted); display:block;">BENCHMARK ARRIVAL</span>
+              <b id="algo-res-arrival" style="color:var(--text-main); font-family:var(--font-mono);">$2,741.00</b>
+            </div>
+            <div>
+              <span style="font-size:9px; color:var(--text-muted); display:block;">REALIZED VWAP</span>
+              <b id="algo-res-realized" style="color:var(--accent-blue); font-family:var(--font-mono);">$2,741.01</b>
+            </div>
+            <div>
+              <span style="font-size:9px; color:var(--text-muted); display:block;">SLIPPAGE (BPS)</span>
+              <b id="algo-res-slippage" style="color:var(--green); font-family:var(--font-mono);">+0.04 bps</b>
+            </div>
+            <div>
+              <span style="font-size:9px; color:var(--text-muted); display:block;">TOTAL COST (USD)</span>
+              <b id="algo-res-cost" style="color:var(--text-main); font-family:var(--font-mono);">$112.50</b>
+            </div>
+          </div>
+
+          <!-- Scrollable Slices Table -->
+          <div style="max-height:110px; overflow-y:auto; border:1px solid var(--border); border-radius:4px;">
+            <table style="width:100%; border-collapse:collapse; font-size:10px; font-family:var(--font-mono); text-align:left;">
+              <thead style="background:var(--bg-panel-sub); position:sticky; top:0; border-bottom:1px solid var(--border);">
+                <tr>
+                  <th style="padding:4px 6px;">#</th>
+                  <th style="padding:4px 6px;">Min</th>
+                  <th style="padding:4px 6px;">Qty</th>
+                  <th style="padding:4px 6px;">Fill Px</th>
+                  <th style="padding:4px 6px;">Slip (bps)</th>
+                  <th style="padding:4px 6px;">Impact</th>
+                  <th style="padding:4px 6px;">Latency</th>
+                  <th style="padding:4px 6px;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="algo-slices-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:8px; color:var(--text-muted);">Click "Run Algo Slicing" to generate child orders.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
     </div>
 
     <!-- TAB 2: SCHEMAS & LAKEHOUSE -->
@@ -2228,6 +2381,76 @@
           </div>
         </div>
       </div>
+
+      <!-- SPRINT 54: TRACK 2 HISTORICAL MACRO SHOCK & STRESS-TESTING SANDBOX -->
+      <div class="panel" style="margin-top:14px; padding:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="color:var(--amber); font-weight:900; font-size:14px;">⚡</span>
+              <h3 style="font-size:14px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.04em;">Historical Macro Shock &amp; Tail-Risk Stress Sandbox</h3>
+            </div>
+            <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Simulated Performance of MoE Volatility-Targeting Engine during Historic Black Swans &amp; CME Liquidity Crunches</p>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="stress-tab-btn active" onclick="loadStressScenario('COVID_2020')" id="btn-stress-COVID_2020" style="padding:4px 8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:4px; background:var(--accent-blue); color:#fff; cursor:pointer;">COVID-19 (Mar 2020)</button>
+            <button class="stress-tab-btn" onclick="loadStressScenario('SVB_RUN_2023')" id="btn-stress-SVB_RUN_2023" style="padding:4px 8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); cursor:pointer;">SVB Run (Mar 2023)</button>
+            <button class="stress-tab-btn" onclick="loadStressScenario('INVASION_2022')" id="btn-stress-INVASION_2022" style="padding:4px 8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); cursor:pointer;">Invasion Spike (Feb 2022)</button>
+            <button class="stress-tab-btn" onclick="loadStressScenario('FLASH_CRASH_2010')" id="btn-stress-FLASH_CRASH_2010" style="padding:4px 8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); cursor:pointer;">Flash Crash (May 2010)</button>
+          </div>
+        </div>
+
+        <!-- 4-Card Stress Summary KPI -->
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:12px; font-size:11px;">
+          <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block; text-transform:uppercase;">Historical Market Shock</span>
+            <b id="stress-mkt-drop" style="font-size:15px; color:var(--red); font-family:var(--font-mono);">-14.70%</b>
+            <span style="font-size:9.5px; color:var(--text-muted); display:block; margin-top:2px;">Unhedged Benchmark</span>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block; text-transform:uppercase;">Strategy Realized DD</span>
+            <b id="stress-strat-dd" style="font-size:15px; color:var(--green); font-family:var(--font-mono);">-2.35%</b>
+            <span id="stress-alpha-pres" style="font-size:9.5px; color:var(--green); font-weight:700; display:block; margin-top:2px;">Alpha Preserved: 84.0%</span>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block; text-transform:uppercase;">Simulated CVaR-99</span>
+            <b id="stress-cvar" style="font-size:15px; color:var(--accent-blue); font-family:var(--font-mono);">-2.84%</b>
+            <span id="stress-recovery" style="font-size:9.5px; color:var(--text-muted); display:block; margin-top:2px;">Recovery: 38.5 Hours</span>
+          </div>
+          <div style="background:var(--bg-panel-sub); padding:10px; border-radius:6px; border:1px solid var(--border); text-align:center;">
+            <span style="font-size:9.5px; color:var(--text-muted); display:block; text-transform:uppercase;">Peak SPAN Encumbrance</span>
+            <b id="stress-span-usd" style="font-size:15px; color:var(--text-main); font-family:var(--font-mono);">$16,420,000</b>
+            <span id="stress-cash-cushion" style="font-size:9.5px; color:var(--green); display:block; margin-top:2px;">Buffer: $33.58M T-Bills</span>
+          </div>
+        </div>
+
+        <!-- Narrative & Timeline Split -->
+        <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:12px; font-size:11.5px;">
+          <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
+            <div style="font-weight:800; color:var(--text-main); margin-bottom:4px;" id="stress-scenario-title">March 2020 COVID Liquidity Crisis &amp; CME/LBMA Spread Blowout</div>
+            <div style="color:var(--text-muted); font-size:11px; margin-bottom:8px;">Dates: <b id="stress-dates">March 09, 2020 - April 15, 2020</b></div>
+            <p style="color:var(--text-main); line-height:1.5; margin-bottom:8px;" id="stress-catalyst">Emergency asset liquidation to meet cash margin calls; air travel shutdown broke transatlantic physical gold arbitrage London -&gt; New York.</p>
+            <div style="background:rgba(2, 132, 199, 0.08); border-left:3px solid var(--accent-blue); padding:6px 10px; border-radius:3px; font-size:11px;" id="stress-mitigation">
+              <b>Automated Risk Mitigation:</b> MoE Parkinson Volatility Targeter cut gross leverage from 2.5x to 0.82x in 4.2 hours; basis arbitrage captured +$1.42M profit on CME-LBMA spread blowout.
+            </div>
+          </div>
+
+          <div style="background:var(--bg-panel-sub); padding:12px; border-radius:6px; border:1px solid var(--border);">
+            <div style="font-weight:800; color:var(--text-main); margin-bottom:6px; font-size:11px; text-transform:uppercase;">Scenario Drawdown Trajectory Timeline</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10.5px; font-family:var(--font-mono);">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border); color:var(--text-muted);">
+                  <th style="padding:3px 4px; text-align:left;">Timeline</th>
+                  <th style="padding:3px 4px; text-align:right;">Market Benchmark</th>
+                  <th style="padding:3px 4px; text-align:right;">Apex MoE Strategy</th>
+                </tr>
+              </thead>
+              <tbody id="stress-timeline-tbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 5: DEVELOPER SDK -->
@@ -2252,6 +2475,64 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tick = json.loads(msg)<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent-blue);">print</span>(f<span style="color:var(--amber);">"[TICK] {tick['timestamp']} {tick['symbol']} Mid: ${tick['mid']}"</span>)<br><br>
         asyncio.run(stream_cme_gold())
+      </div>
+
+      <!-- SPRINT 54: TRACK 3 INSTITUTIONAL MULTI-CHANNEL WEBHOOK HUB -->
+      <div class="panel" style="margin-top:14px; padding:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-blue);"></span>
+              <h3 style="font-size:14px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:0.04em;">Institutional Webhook Dispatcher &amp; Event Hub</h3>
+            </div>
+            <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Automated HTTPS Webhook Delivery with HMAC-SHA256 Signatures for Slack, Discord &amp; Custom OMS</p>
+          </div>
+          <button onclick="dispatchInstitutionalWebhook()" class="action-btn" style="padding:5px 12px; font-size:11px; font-weight:800; background:var(--accent-blue); color:#fff; border:none; border-radius:4px; cursor:pointer;">🚀 Dispatch Test Webhook</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1.5fr; gap:10px; margin-bottom:12px; font-size:11.5px;">
+          <div>
+            <label style="display:block; font-size:10px; color:var(--text-muted); font-weight:700; margin-bottom:3px;">DESTINATION CHANNEL</label>
+            <select id="wh-channel" style="width:100%; padding:6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+              <option value="slack" selected>Slack Incoming Webhook</option>
+              <option value="discord">Discord Webhook</option>
+              <option value="custom">Enterprise OMS / Custom API</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:10px; color:var(--text-muted); font-weight:700; margin-bottom:3px;">EVENT TYPE</label>
+            <select id="wh-event-type" style="width:100%; padding:6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-weight:700;">
+              <option value="BLOCK_TRADE_DETECTED" selected>CME Block Trade (&gt;100 Contracts)</option>
+              <option value="RISK_CIRCUIT_BREAKER">Volatility Circuit Breaker (4.5-Sigma)</option>
+              <option value="REGIME_SHIFT_BEARISH">Cross-Asset GAT Regime Transition</option>
+              <option value="MARGIN_SPAN_ALERT">FCM SPAN Margin 25% Threshold</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:10px; color:var(--text-muted); font-weight:700; margin-bottom:3px;">TARGET WEBHOOK URL (OPTIONAL)</label>
+            <input id="wh-target-url" type="text" placeholder="https://hooks.slack.com/services/... (Leave blank for instant simulation)" style="width:100%; padding:6px; border:1px solid var(--border); border-radius:4px; background:var(--bg-panel-sub); font-family:var(--font-mono); font-size:10.5px;">
+          </div>
+        </div>
+
+        <!-- Webhook Output Preview -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:11px;">
+          <div style="background:var(--bg-panel-sub); border:1px solid var(--border); border-radius:6px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <b style="color:var(--text-main);">DELIVERY STATUS &amp; HMAC HEADERS</b>
+              <span id="wh-status-badge" style="padding:2px 8px; font-size:10px; font-weight:800; border-radius:4px; background:#dcfce7; color:#15803d;">READY TO TEST</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:10px; background:var(--bg-main); padding:8px; border-radius:4px; border:1px solid var(--border); overflow-x:auto;">
+              <span style="color:var(--accent-blue);">X-Apex-Signature:</span> <span id="wh-sig-preview">t=1793534531,v1=13b9362cc57f61f8aac7d180db...</span><br>
+              <span style="color:var(--accent-blue);">X-Apex-Event-ID:</span> <span id="wh-event-id-preview">evt_27320b10ab05</span><br>
+              <span style="color:var(--accent-blue);">Latency:</span> <span id="wh-latency-preview">12.4 ms</span>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-panel-sub); border:1px solid var(--border); border-radius:6px; padding:10px;">
+            <b style="color:var(--text-main); display:block; margin-bottom:6px;">JSON PAYLOAD PREVIEW</b>
+            <pre id="wh-payload-preview" style="margin:0; font-family:var(--font-mono); font-size:10px; background:var(--bg-main); padding:8px; border-radius:4px; border:1px solid var(--border); max-height:100px; overflow-y:auto; color:var(--text-main);">Click "Dispatch Test Webhook" to generate live HMAC-signed payload.</pre>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3506,12 +3787,190 @@
       }, stepTime);
     }
 
+    // =========================================================================
+    // SPRINT 54 FUNCTIONS: VPIN, ALGO SIM, STRESS TEST, WEBHOOK HUB
+    // =========================================================================
+    async function fetchVpinToxicity() {
+      const sym = document.getElementById('vpin-symbol-select')?.value || 'GC';
+      try {
+        const resp = await fetch(`/api/v1/microstructure/vpin?symbol=${sym}&bucket_size=500&n_buckets=50`);
+        if (!resp.ok) return;
+        const d = await resp.json();
+        
+        const dispVal = document.getElementById('vpin-display-val');
+        if (dispVal) dispVal.innerText = d.vpin_metric.toFixed(4);
+        const badge = document.getElementById('vpin-regime-badge');
+        if (badge) {
+          badge.innerText = d.regime_label.toUpperCase();
+          badge.style.background = d.badge_color === '#10b981' ? '#dcfce7' : (d.badge_color === '#f59e0b' ? '#fef3c7' : '#fee2e2');
+          badge.style.color = d.badge_color === '#10b981' ? '#15803d' : (d.badge_color === '#f59e0b' ? '#b45309' : '#b91c1c');
+        }
+        
+        const pctVal = document.getElementById('vpin-percentile-val');
+        if (pctVal) pctVal.innerText = `${d.cdf_percentile.toFixed(1)}% (CDF)`;
+        const advRisk = document.getElementById('vpin-adverse-risk');
+        if (advRisk) {
+          advRisk.innerText = d.adverse_selection_risk;
+          advRisk.style.color = d.toxic_alert ? 'var(--red)' : 'var(--green)';
+        }
+
+        const container = document.getElementById('vpin-sparkline-container');
+        if (container && d.recent_buckets) {
+          container.innerHTML = '';
+          const maxImb = Math.max(...d.recent_buckets.map(b => b.volume_imbalance), 200);
+          d.recent_buckets.forEach(b => {
+            const h = Math.max(6, Math.round((b.volume_imbalance / maxImb) * 40));
+            const bar = document.createElement('div');
+            bar.style.flex = '1';
+            bar.style.height = `${h}px`;
+            bar.style.borderRadius = '2px 2px 0 0';
+            bar.style.background = b.vpin > 0.5 ? 'var(--red)' : (b.vpin > 0.32 ? 'var(--amber)' : 'var(--accent-blue)');
+            bar.title = `Bucket ${b.bucket_id}: Imbalance ${b.volume_imbalance} | VPIN ${b.vpin}`;
+            container.appendChild(bar);
+          });
+        }
+      } catch (e) {
+        console.error("fetchVpinToxicity error:", e);
+      }
+    }
+
+    async function runAlgoSimulation() {
+      const sym = document.getElementById('vpin-symbol-select')?.value || 'GC';
+      const qty = parseInt(document.getElementById('algo-sim-qty')?.value || '50');
+      const algo = document.getElementById('algo-sim-type')?.value || 'VWAP';
+      const duration = parseInt(document.getElementById('algo-sim-duration')?.value || '30');
+      const side = document.getElementById('algo-sim-side')?.value || 'BUY';
+
+      try {
+        const resp = await fetch('/api/v1/execution/simulate-algo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol: sym, algo: algo, parent_qty: qty, duration_mins: duration, side: side })
+        });
+        if (!resp.ok) return;
+        const d = await resp.json();
+
+        document.getElementById('algo-res-arrival').innerText = `$${d.arrival_benchmark_price.toFixed(2)}`;
+        document.getElementById('algo-res-realized').innerText = `$${d.realized_execution_price.toFixed(2)}`;
+        document.getElementById('algo-res-slippage').innerText = `${d.total_slippage_bps >= 0 ? '+' : ''}${d.total_slippage_bps.toFixed(2)} bps`;
+        document.getElementById('algo-res-slippage').style.color = Math.abs(d.total_slippage_bps) < 0.5 ? 'var(--green)' : 'var(--amber)';
+        document.getElementById('algo-res-cost').innerText = `$${d.net_total_execution_cost_usd.toFixed(2)}`;
+
+        const tbody = document.getElementById('algo-slices-tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          d.child_slices.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border)';
+            tr.innerHTML = `
+              <td style="padding:3px 6px;">${s.slice_id}</td>
+              <td style="padding:3px 6px;">+${s.minute}m</td>
+              <td style="padding:3px 6px; font-weight:700;">${s.child_contracts}</td>
+              <td style="padding:3px 6px;">$${s.fill_price.toFixed(2)}</td>
+              <td style="padding:3px 6px; color:${s.slippage_bps <= 0.1 ? 'var(--green)' : 'var(--amber)'};">${s.slippage_bps >= 0 ? '+' : ''}${s.slippage_bps.toFixed(2)}</td>
+              <td style="padding:3px 6px;">$${s.temporary_impact_usd.toFixed(2)}</td>
+              <td style="padding:3px 6px; color:var(--text-muted);">${s.latency_ms}ms</td>
+              <td style="padding:3px 6px;"><span style="color:#15803d; font-weight:800; background:#dcfce7; padding:1px 4px; border-radius:3px;">FILLED</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        console.error("runAlgoSimulation error:", e);
+      }
+    }
+
+    async function loadStressScenario(scenarioId) {
+      document.querySelectorAll('.stress-tab-btn').forEach(b => {
+        b.style.background = 'var(--bg-panel-sub)';
+        b.style.color = 'var(--text-main)';
+      });
+      const activeBtn = document.getElementById(`btn-stress-${scenarioId}`);
+      if (activeBtn) {
+        activeBtn.style.background = 'var(--accent-blue)';
+        activeBtn.style.color = '#fff';
+      }
+
+      try {
+        const resp = await fetch(`/api/v1/backtest/stress-test?scenario=${scenarioId}`);
+        if (!resp.ok) return;
+        const d = await resp.json();
+
+        document.getElementById('stress-mkt-drop').innerText = d.historical_market_drawdown;
+        document.getElementById('stress-strat-dd').innerText = d.strategy_drawdown;
+        document.getElementById('stress-alpha-pres').innerText = `Alpha Preserved: ${d.alpha_preservation_ratio}`;
+        document.getElementById('stress-cvar').innerText = d.cvar_99;
+        document.getElementById('stress-recovery').innerText = `Recovery: ${d.max_recovery_hours} Hours`;
+        document.getElementById('stress-span-usd').innerText = d.peak_span_margin_usd;
+        document.getElementById('stress-cash-cushion').innerText = `Buffer: ${d.unencumbered_cash_buffer} T-Bills`;
+
+        document.getElementById('stress-scenario-title').innerText = d.scenario_name;
+        document.getElementById('stress-dates').innerText = d.dates;
+        document.getElementById('stress-catalyst').innerText = d.catalyst;
+        document.getElementById('stress-mitigation').innerHTML = `<b>Automated Risk Mitigation:</b> ${d.mitigation_behavior}`;
+
+        const tbody = document.getElementById('stress-timeline-tbody');
+        if (tbody) {
+          tbody.innerHTML = '';
+          d.timeline.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border)';
+            tr.innerHTML = `
+              <td style="padding:3px 4px; color:var(--text-muted);">${row.step}</td>
+              <td style="padding:3px 4px; text-align:right; color:var(--red); font-weight:700;">${row.market >= 0 ? '+' : ''}${row.market.toFixed(2)}%</td>
+              <td style="padding:3px 4px; text-align:right; color:var(--green); font-weight:700;">${row.strategy >= 0 ? '+' : ''}${row.strategy.toFixed(2)}%</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        console.error("loadStressScenario error:", e);
+      }
+    }
+
+    async function dispatchInstitutionalWebhook() {
+      const channel = document.getElementById('wh-channel')?.value || 'slack';
+      const eventType = document.getElementById('wh-event-type')?.value || 'BLOCK_TRADE_DETECTED';
+      const targetUrl = document.getElementById('wh-target-url')?.value.trim() || null;
+
+      try {
+        const resp = await fetch('/api/v1/webhooks/dispatch-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel: channel, event_type: eventType, target_url: targetUrl })
+        });
+        if (!resp.ok) return;
+        const d = await resp.json();
+
+        const badge = document.getElementById('wh-status-badge');
+        if (badge) {
+          badge.innerText = d.delivery_mode.toUpperCase();
+          badge.style.background = '#dcfce7';
+          badge.style.color = '#15803d';
+        }
+
+        const sigEl = document.getElementById('wh-sig-preview');
+        if (sigEl) sigEl.innerText = d.signature_header;
+        const evtIdEl = document.getElementById('wh-event-id-preview');
+        if (evtIdEl) evtIdEl.innerText = d.event_id;
+        const latEl = document.getElementById('wh-latency-preview');
+        if (latEl) latEl.innerText = `${d.latency_ms} ms`;
+        const payEl = document.getElementById('wh-payload-preview');
+        if (payEl) payEl.innerText = JSON.stringify(d.payload, null, 2);
+      } catch (e) {
+        console.error("dispatchInstitutionalWebhook error:", e);
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
       initChart();
       loadDepth10('GC');
       loadSbeTemplate('514');
       startDomFlowTimer();
+      fetchVpinToxicity();
+      loadStressScenario('COVID_2020');
+      runAlgoSimulation();
       connectWS();
     });
   </script>
